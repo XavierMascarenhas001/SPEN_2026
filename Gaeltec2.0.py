@@ -1315,7 +1315,15 @@ if misc_file is not None:
             with pd.ExcelWriter(buffer_sep, engine='openpyxl') as writer:
                 for bar_value in bar_data['Mapped']:
                     df_bar = sub_df[sub_df['mapped'] == bar_value].copy()
+                     # 🔑 NORMALIZE COLUMNS
+                    df_bar.columns = df_bar.columns.str.strip().str.lower()
                     df_bar = df_bar.loc[:, ~df_bar.columns.duplicated()]
+                    df_bar = df_bar.rename(columns={
+                    "poling team": "code",
+                    "team_name": "team lider"
+                    })
+
+                    
                     if 'datetouse' in df_bar.columns:
                         df_bar['datetouse_display'] = pd.to_datetime(
                             df_bar['datetouse'], errors='coerce'
