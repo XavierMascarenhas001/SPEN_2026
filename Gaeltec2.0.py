@@ -301,6 +301,27 @@ pole_keys = {
     "16x365 HV SINGLE POLE": "16s",
     "16x385 HV SINGLE POLE": "16es",
     "16x405 HV SINGLE POLE": "16esp",
+    "11x315 H POLE HV Creosote":"11es"
+    "14x335 H POLE HV Creosote":"14s"
+    "11x315 HV SINGLE POLE":"11es"
+    "13x320 H POLE HV Creosote":"13s"
+    "11x240 CREOSOTE LV POLE":"11"
+    "11x240 HV SINGLE POLE":"11m"
+    "10x230 CREOSOTE LV POLE":"10m"
+    "11x335 H POLE HV Creosote":"11esp"
+    "10x305 H POLE HV Creosote":"10es"
+    "11x240 BIOCIDE LV POLE":"11m B"
+    "16x365 H POLE HV Creosote":"16s"
+    "16x405 EHV SINGLE POLE CREOSOTE":"16esp"
+    "14x355 H Delta HVY SP4147830":"14es"
+    "14x355 H POLE HV Creosote":"14es"
+    "12x325 H POLE HV Creosote":"12es"
+    "16x385 H POLE HV Creosote":"16es"
+    "12x305 EHV SINGLE POLE CREOSOTE":"12s"
+    "13x340 EHV SINGLE POLE CREOSOTE":"13es"
+    "11x335 EHV SINGLE POLE CREOSOTE":"11es"
+    "11x315 EHV SINGLE POLE CREOSOTE":"11es"
+    "12x325 EHV SINGLE POLE CREOSOTE":"12es"
 }
 
 # --- Equipment / Conductor Mappings ---
