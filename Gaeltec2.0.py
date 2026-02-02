@@ -779,37 +779,51 @@ st.markdown("<h1>📊 Data Management Dashboard</h1>", unsafe_allow_html=True)
 # -------------------------------
 # --- Upload Aggregated Parquet file ---
 # --- Load aggregated Parquet file ---
-aggregated_file = r"Master.parquet"
+st.header("Upload Data Files")
+
+aggregated_file = st.file_uploader(
+    "Upload Master.parquet",
+    type=["parquet"],
+    key="master"
+)
+
+agg_view = None
+
 if aggregated_file is not None:
     df = pd.read_parquet(aggregated_file)
     df.columns = df.columns.str.strip().str.lower()  # normalize columns
 
     if 'datetouse' in df.columns:
-        # Convert to datetime where possible
         df['datetouse_dt'] = pd.to_datetime(df['datetouse'], errors='coerce')
-        # Create display column
         df['datetouse_display'] = df['datetouse_dt'].dt.strftime("%d/%m/%Y")
-        # Mark empty dates as "Unplanned"
         df.loc[df['datetouse_dt'].isna(), 'datetouse_display'] = "Unplanned"
-        # OPTIONAL: normalize datetime column for sorting, keeping NaT intact
         df['datetouse_dt'] = df['datetouse_dt'].dt.normalize()
     else:
-        # Handle case where column is missing
         df['datetouse_dt'] = pd.NaT
         df['datetouse_display'] = "Unplanned"
-        
-    # Create agg_view for later use
+
     agg_view = df.copy()
 
 # --- Load Resume Parquet file (for %Complete pie chart) ---
-resume_file = r"CF_resume.parquet"
+resume_file = st.file_uploader(
+    "Upload CF_resume.parquet",
+    type=["parquet"],
+    key="resume"
+)
+
+resume_df = None
+
 if resume_file is not None:
     resume_df = pd.read_parquet(resume_file)
-    resume_df.columns = resume_df.columns.str.strip().str.lower()  # normalize columns
-
+    resume_df.columns = resume_df.columns.str.strip().str.lower()
 
 # --- Load Miscellaneous Parquet file ---
-misc_file = "miscelaneous.parquet"
+misc_file = st.file_uploader(
+    "Upload miscelaneous.parquet",
+    type=["parquet"],
+    key="misc"
+)
+
 misc_df = None
 
 if misc_file is not None:
