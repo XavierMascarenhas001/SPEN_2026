@@ -22,6 +22,7 @@ from collections import OrderedDict
 from openpyxl.styles import Font, PatternFill
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Border, Side
+import io
 
 # --- Page config for wide layout ---
 st.set_page_config(
@@ -175,6 +176,28 @@ def poles_to_word(df: pd.DataFrame) -> BytesIO:
     doc.save(buffer)
     buffer.seek(0)
     return buffer
+
+def build_export_df(filtered_df):
+    export_df = filtered_df.copy()
+
+    # Rename columns
+    export_df = export_df.rename(columns=column_rename_map)
+
+    # Keep only columns that actually exist
+    existing_cols = [c for c in export_columns if c in export_df.columns]
+    export_df = export_df[existing_cols]
+
+    return export_df
+
+# Normalize strings: remove leading/trailing spaces, lowercase, remove extra dots
+def normalize_item(s):
+    if pd.isna(s):
+        return ""
+    s = str(s).strip().lower()           # strip spaces and lowercase
+    s = s.replace(".", "")               # remove dots
+    s = re.sub(r"\s+", " ", s)          # collapse multiple spaces
+    return s
+
     
 # --- MAPPINGS ---
 
@@ -721,6 +744,30 @@ foundation_steelwork_keys = {
     "Foundation Block Type 3; 1500mm as SP4019020": "Foundation Block Type 3; 1500mm as SP4019020"
 }
 
+summary_items = [
+    "Erect Single HV/EHV Pole, up to and including 12 metre pole.",
+    "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole",
+    "Erect LV Structure Single Pole, up to and including 12 metre pole",
+    "Recover single pole, up to and including 15 metres in height, and reinstate, all ground conditions",
+    "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions",
+    "Erect 11kV/33kV ABSW.",
+    "Erect 11kV Remote Controlled Switch Disconnector ( Soule Auguste ) or Auto Reclosure unit c/w VT, Aerial, RTU & umbilical cable",
+    "Erect pole mounted transformer up to 100kVA 1.ph",
+    "Erect pole mounted transformer up to 200kVA 3.p.h",
+    "Remove pole mounted transformer",
+    "Remove platform mounted or 'H' pole mounted transformer",
+    "Remove 11kV/33kV ABSW",
+    "Remove Auto Reclosure",
+    "Install bare conductor, run out, sag, terminate, bind in and connect jumpers; <100mm²",
+    "Install bare conductor, run out, sag, terminate, bind in and connect jumpers; >=100mm² <200mm²",
+    "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 2c + Earth",
+    "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 4c + Earth",
+    "Install service span including connection to mainline & building / structure",
+    "Remove 1.ph or 3.ph HV fuses",
+    "Erect 3.ph fuse units at single tee off pole or in line pole"
+    
+]
+
 categories = [
     ("Poles 🪵", pole_keys, "Quantity"),
     ("Poles _erected 🪵", pole_erected_keys, "Quantity"),
@@ -741,12 +788,19 @@ column_rename_map = {
     "mapped": "Output",
     "segmentcode": "Circuit",
     "datetouse_display": "Date",
-    "qsub": "Quantity",
+    "qty": "Quantity_original",
+    "qsub": "Quantity_used",
     "segmentdesc": "Segment",
     "shire": "District",
     "pid_ohl_nr": "PID",
     "projectmanager": "Project Manager"
 }
+
+export_columns = [
+    'Output','comment', 'item', 'Quantity_original','Quantity_used', 'material_code','type', 'pole', 'Date',
+    'District', 'project', 'Project Manager', 'Circuit', 'Segment',
+    'team lider', 'PID', 'sourcefile'
+]
 
 # --- Gradient background ---
 gradient_bg = """
@@ -894,122 +948,7 @@ if misc_file is not None:
             filtered_df = filtered_df[filtered_df['datetouse'].isna()]
             date_range_str = "Unplanned"
 
-    # -------------------------------
-    # --- Total & Variation Display ---
-    # -------------------------------
-    total_sum, variation_sum = 0, 0
-    if 'total' in filtered_df.columns:
-        total_series = pd.to_numeric(filtered_df['total'].astype(str).str.replace(" ", "").str.replace(",", ".", regex=False),
-                                     errors='coerce')
-        total_sum = total_series.sum(skipna=True)
-        if 'orig' in filtered_df.columns:
-            orig_series = pd.to_numeric(filtered_df['orig'].astype(str).str.replace(" ", "").str.replace(",", ".", regex=False),
-                                        errors='coerce')
-            variation_sum = (total_series - orig_series).sum(skipna=True)
 
-    formatted_total = f"{total_sum:,.2f}".replace(",", " ").replace(".", ",")
-    formatted_variation = f"{variation_sum:,.2f}".replace(",", " ").replace(".", ",")
-
-    # Money logo
-    money_logo_path = r"Images/Pound.png"
-    money_logo = Image.open(money_logo_path).resize((40, 40))
-    buffered = BytesIO()
-    money_logo.save(buffered, format="PNG")
-    money_logo_base64 = base64.b64encode(buffered.getvalue()).decode()
-
-    # Display Total & Variation (Centered)
-    st.markdown("<h2>Financial</h2>", unsafe_allow_html=True)
-    st.markdown("<h3 style='text-align:center; color:white;'>Revenue</h3>", unsafe_allow_html=True)
-    try:
-        st.markdown(
-            f"""
-            <div style='display:flex; justify-content:center;'>
-                <div style='display:flex; flex-direction:column; gap:4px;'>
-                    <div style='display:flex; align-items:center; gap:10px;'>
-                        <h2 style='color:#32CD32; margin:0; font-size:36px;'><b>Total:</b> {formatted_total}</h2>
-                        <img src='data:image/png;base64,{money_logo_base64}' width='40' height='40'/>
-                    </div>
-                    <div style='display:flex; align-items:center; gap:8px;'>
-                        <h2 style='color:#32CD32; font-size:25px; margin:0;'><b>Variation:</b> {formatted_variation}</h2>
-                        <img src='data:image/png;base64,{money_logo_base64}' width='28' height='28'/>
-                    </div>
-                    <p style='text-align:center; font-size:14px; margin-top:4px;'>
-                        ({date_range_str}, Shires: {selected_shire}, Projects: {selected_project}, PMs: {selected_pm})
-                    </p>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-    except Exception as e:
-        st.warning(f"Could not display Total & Variation: {e}")
-    # -------------------------------
-    # --- Revenue Chart (Full Width) ---
-    # -------------------------------
-    st.markdown("<h3 style='text-align:center; color:white;'>Revenue</h3>", unsafe_allow_html=True)
-    try:
-        if 'filtered_df' in locals() and not filtered_df.empty and 'total' in filtered_df.columns:
-
-            chart_df = filtered_df[filtered_df['datetouse_dt'].notna()].copy()
-            chart_df = chart_df[chart_df['datetouse_dt'] >= '2000-01-01']
-            chart_df['total'] = pd.to_numeric(chart_df['total'], errors='coerce')
-            chart_df = chart_df[chart_df['total'].notna()]
-
-            if not chart_df.empty:
-                revenue_by_date = chart_df.groupby('datetouse_dt')['total'].sum().reset_index()
-                revenue_by_date = revenue_by_date.sort_values('datetouse_dt')
-                revenue_by_date['total_formatted'] = revenue_by_date['total'].apply(
-                    lambda x: f"£{x:,.0f}" if x >= 1000 else f"€{x:.0f}"
-                )
-
-                fig_revenue = px.line(
-                    revenue_by_date,
-                    x='datetouse_dt',
-                    y='total',
-                    title="Daily Revenue",
-                    labels={'datetouse_dt': 'Date', 'total': 'Revenue (£)'}
-                )
-                fig_revenue.update_traces(
-                    mode='lines+markers',
-                    line=dict(width=3, color='#32CD32'),
-                    marker=dict(size=6, color='#32CD32'),
-                    hovertemplate='<b>Date: %{x}</b><br>Revenue: £%{y:,.0f}<extra></extra>'
-                )
-                fig_revenue.update_layout(
-                    height=600,  # taller chart
-                    xaxis=dict(
-                        tickformatstops=[
-                            dict(dtickrange=[None, 1000*60*60*24*30], value="%d %b %Y"),
-                            dict(dtickrange=[1000*60*60*24*30, None], value="%b %Y")
-                        ],
-                        tickangle=45,
-                        gridcolor='rgba(128,128,128,0.2)',
-                        rangeslider=dict(visible=True),
-                        type='date'
-                    ),
-                    yaxis=dict(
-                        title='Revenue (£)',
-                        tickformat=",.0f",
-                        gridcolor='rgba(128,128,128,0.2)',
-                        autorange=True,
-                        fixedrange=False  # <-- allow dynamic scaling on zoom
-                    ),
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    font=dict(color='white'),
-                    title_font_size=16,
-                    hovermode='x unified'
-                )
-
-                st.plotly_chart(fig_revenue, use_container_width=True)
-            else:
-                st.info("No projects with dates since 2000 for selected filters.")
-        else:
-            st.info("No data available for the selected filters.")
-
-    except Exception as e:
-        st.warning(f"Could not generate revenue chart: {e}")
-                
     # Display Project and completion
     col_top_left, col_top_right = st.columns([1, 1])
     # Project Completion
@@ -1093,58 +1032,8 @@ if misc_file is not None:
                                 st.write("No segment codes for this project.")
             else:
                 st.info("Project or Segment Code columns not found in the data.")
-        
+
             
-            # --- Pie Chart: % Complete ---
-# -------------------------------
-    # --- Works Complete Pie Chart ---
-    # -------------------------------
-    st.markdown("<h3 style='text-align:center; color:white;'>Works Complete</h3>", unsafe_allow_html=True)
-    try:
-        if 'resume_df' in locals():
-            filtered_segments = filtered_df['segment'].dropna().astype(str).str.strip().str.lower().unique()
-            resume_df['section'] = resume_df['section'].dropna().astype(str).str.strip().str.lower()
-
-            if {'section', '%complete'}.issubset(resume_df.columns):
-                resume_filtered = resume_df[resume_df['section'].isin(filtered_segments)]
-
-                if not resume_filtered.empty:
-                    avg_complete = resume_filtered['%complete'].mean()
-                    avg_complete = min(max(avg_complete, 0), 100)
-
-                    pie_data = pd.DataFrame({
-                        'Status': ['Completed', 'Done or Remaining'],
-                        'Value': [avg_complete, 100 - avg_complete]
-                    })
-
-                    fig_pie = px.pie(
-                        pie_data,
-                        names='Status',
-                        values='Value',
-                        color='Status',
-                        color_discrete_map={'Completed': 'green', 'Done or Remaining': 'red'},
-                        hole=0.6
-                    )
-                    fig_pie.update_traces(
-                        textinfo='percent+label',
-                        textfont_size=20
-                    )
-                    fig_pie.update_layout(
-                        title_text="",
-                        title_font_size=20,
-                        font=dict(color='white'),
-                        paper_bgcolor='rgba(0,0,0,0)',
-                        plot_bgcolor='rgba(0,0,0,0)',
-                        showlegend=True,
-                        legend=dict(font=dict(color='white'))
-                    )
-
-                    st.plotly_chart(fig_pie, use_container_width=True)
-                else:
-                    st.info("No matching sections found for the selected filters to generate % completion chart.")
-
-    except Exception as e:
-        st.warning(f"Could not generate % Complete pie chart: {e}")
         
     # -------------------------------
     # --- Map Section ---
@@ -1580,10 +1469,10 @@ if misc_df is not None:
     # Data preparation
     # -----------------------------
     filtered_df['item'] = filtered_df['item'].astype(str)
-    misc_df['column_b'] = misc_df['column_b'].astype(str)
+    misc_df['column_1'] = misc_df['column_1'].astype(str)
 
     # Map items to work instructions
-    item_to_column_i = misc_df.set_index('column_b')['column_i'].to_dict()
+    item_to_column_i = misc_df.set_index('column_1')['column_2'].to_dict()
     poles_df = filtered_df[filtered_df['pole'].notna() & (filtered_df['pole'].astype(str).str.lower() != "nan")].copy()
     poles_df['Work instructions'] = poles_df['item'].map(item_to_column_i)
 
@@ -1659,67 +1548,167 @@ if misc_df is not None:
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
 
-# -----------------------------
-# 📈 Jobs per Team per Day (Segment + Pole aware)
-# -----------------------------
-st.subheader("📈 Jobs per Team per Day")
+from io import BytesIO
+from openpyxl.drawing.image import Image as XLImage
 
-if agg_view is not None and 'total' in agg_view.columns:
-    filtered_agg = agg_view.copy()
+if filtered_df is not None and not filtered_df.empty:
+    buffer_agg = BytesIO()
 
-    # Apply segment filter
-    if selected_segment != 'All' and 'segmentcode' in filtered_agg.columns:
-        filtered_agg = filtered_agg[
-            filtered_agg['segmentcode'].astype(str).str.strip() == str(selected_segment).strip()
+    with pd.ExcelWriter(buffer_agg, engine="openpyxl") as writer:
+
+        # ---- Prepare export_df ----
+        export_df = filtered_df.copy()
+        export_df = export_df.rename(columns=column_rename_map)
+
+        if "datetouse" in export_df.columns:
+            export_df["datetouse_display"] = pd.to_datetime(
+                export_df["datetouse"], errors="coerce"
+            ).dt.strftime("%d/%m/%Y")
+            export_df.loc[
+                export_df["datetouse"].isna(), "datetouse_display"
+            ] = "Unplanned"
+
+        cols_to_include = [
+            "item","comment", "Quantity_original", "Quantity_used", "material_code",
+            "type", "pole", "Date", "District", "project",
+            "Project Manager", "Circuit", "Segment",
+            "team lider", "PID", "sourcefile"
         ]
+        cols_to_include = [c for c in cols_to_include if c in export_df.columns]
+        export_df = export_df[cols_to_include]
 
-    # Apply pole filter
-    if selected_pole != "All" and 'pole' in filtered_agg.columns:
-        filtered_agg = filtered_agg[
-            filtered_agg['pole'].astype(str).str.strip() == str(selected_pole).strip()
-        ]
+        # ---- Output sheet (start below images) ----
+        export_df.to_excel(writer, sheet_name="Output", index=False, startrow=1)
+        ws = writer.book["Output"]
 
-    # Ensure datetime column
-    if 'datetouse_dt' not in filtered_agg.columns:
-        filtered_agg['datetouse_dt'] = pd.to_datetime(filtered_agg['datetouse'], errors='coerce')
-    else:
-        filtered_agg['datetouse_dt'] = pd.to_datetime(filtered_agg['datetouse_dt'], errors='coerce')
+        # ---- Summary sheet ----
+        if "Quantity_used" in export_df.columns:
+            # Ensure numeric type
+            # Apply normalization
+            export_df["Quantity_used"] = pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0)
+            special_item = (
+                "Erect 11kV Remote Controlled Switch Disconnector (Soule Auguste) or Auto Reclosure unit c/w VT, Aerial, RTU & umbilical cable."
+            )
+            export_df["item_norm"] = export_df["item"].apply(normalize_item)
+            summary_items_norm = [normalize_item(i) for i in summary_items]
+            special_item_norm = normalize_item(special_item)
+                # Add comments column for the special item
+            # Aggregate sum by item
+            summary_df = (
+                export_df[export_df["item_norm"].isin(summary_items_norm)]
+                .groupby("item_norm", as_index=False)["Quantity_used"]
+                .sum()
+            )
 
-    # Ensure 'total' is numeric
-    filtered_agg['total'] = pd.to_numeric(filtered_agg['total'], errors='coerce').fillna(0)
+            pattern = re.escape(special_item.strip())
+            # Extract all rows for the special item
+            special_df = export_df[export_df["item_norm"].str.contains(special_item_norm, na=False)].copy()
 
-    # Drop invalid rows
-    filtered_agg = filtered_agg.dropna(subset=['datetouse_dt', 'team_name'])
+            if not special_df.empty:
+                # Group by unique comment and sum quantities
+                special_summary = (
+                    special_df.groupby(["item", "comment"], as_index=False)["Quantity_used"]
+                    .sum()
+                    .rename(columns={"item": "Description", "Quantity_used": "Total Quantity", "comment": "Comment"})
+                    )
+            else:
+                special_summary = pd.DataFrame(columns=["Description", "Total Quantity", "Comment"])
 
-    if not filtered_agg.empty:
-        # Aggregate per day per team
-        time_df = filtered_agg.groupby(['datetouse_dt', 'team_name'], as_index=False)['total'].sum()
+            # Append special item summary (multiple rows per comment)
+            final_summary = pd.concat([general_summary, special_summary], ignore_index=True, sort=False)
 
-        # Plot line chart
-        fig_time = px.line(
-            time_df,
-            x='datetouse_dt',
-            y='total',
-            color='team_name',
-            markers=True,
-            hover_data={'datetouse_dt': True, 'team_name': True, 'total': True}
-        )
-        fig_time.update_layout(
-            xaxis_title="Day",
-            yaxis_title="Total Jobs £",
-            xaxis=dict(
-                tickformat="%d/%m/%Y",
-                tickangle=45,
-                nticks=10,
-                tickmode='auto',
-            ),
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)',
-            legend_title_text="Team",
-            height=500
-        )
-        st.plotly_chart(fig_time, use_container_width=True)
-    else:
-        st.info("No time-based data available for the selected filters.")
+            # Write summary sheet
+            final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1)
+            ws_summary = writer.book["Summary"]
+
+        # ---- Formatting styles ----
+        header_font = Font(bold=True, size=16)
+        header_fill = PatternFill(start_color="00CCFF", end_color="00CCFF", fill_type="solid")
+        thin_side = Side(style="thin")
+        medium_side = Side(style="medium")
+        thick_side = Side(style="thick")
+        light_grey_fill = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
+        white_fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+
+        # AFTER ✅
+        for sheet in [ws, ws_summary]:
+            sheet.row_dimensions[1].height = 90   # logo row
+
+        # ---- Load & resize images ----
+        IMG_HEIGHT = 120
+        IMG_WIDTH_SMALL = 120
+        IMG_WIDTH_LARGE = IMG_WIDTH_SMALL * 3  # 🔹 3× wider
+
+        img1 = XLImage("Images/GaeltecImage.png")
+        img2 = XLImage("Images/SPEN.png")
+
+        img1.width = IMG_WIDTH_SMALL
+        img1.height = IMG_HEIGHT
+
+        img2.width = IMG_WIDTH_LARGE
+        img2.height = IMG_HEIGHT
+
+        # Position images (row 1)
+        img1.anchor = "A1"
+        img2.anchor = "B1"
+
+        ws.add_image(img1)
+        ws.add_image(img2)
+
+        # Same for Summary
+        img1_s = XLImage("Images/GaeltecImage.png")
+        img2_s = XLImage("Images/SPEN.png")
+
+        img1_s.width = IMG_WIDTH_SMALL
+        img1_s.height = IMG_HEIGHT
+        img1_s.anchor = "A1"
+
+        img2_s.width = IMG_WIDTH_LARGE
+        img2_s.height = IMG_HEIGHT
+        img2_s.anchor = "B1"
+
+        ws_summary.add_image(img1_s)
+        ws_summary.add_image(img2_s)
+
+
+        # ---- Formatting (unchanged style) ----
+        for sheet in [ws, ws_summary]:
+            max_col = sheet.max_column
+            max_row = sheet.max_row
+
+            # HEADER → ROW 2 ✅
+            for col_idx, cell in enumerate(sheet[2], start=1):
+                cell.font = header_font
+                cell.fill = header_fill
+                sheet.column_dimensions[get_column_letter(col_idx)].width = 60 if col_idx == 1 else 20
+                cell.border = Border(
+                    left=thick_side if col_idx == 1 else medium_side,
+                    right=thick_side if col_idx == max_col else medium_side,
+                    top=thick_side,
+                    bottom=thick_side
+                )
+
+            # DATA ROWS → START ROW 3 ✅
+            for row_idx in range(3, max_row + 1):
+                fill = light_grey_fill if row_idx % 2 == 1 else white_fill
+                for col_idx in range(1, max_col + 1):
+                    cell = sheet.cell(row=row_idx, column=col_idx)
+                    cell.fill = fill
+                    cell.border = Border(
+                        left=thin_side,
+                        right=thin_side,
+                        top=thin_side,
+                        bottom=thin_side
+                    )
+
+    # ---- Download button ----
+    buffer_agg.seek(0)
+    st.download_button(
+        label="📥 Download Excel (Output Details)",
+        data=buffer_agg,
+        file_name="Gaeltec_Output.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
 else:
-    st.info("No 'total' column found in aggregated data.")
+    st.info("Project or Segment Code columns not found in the data.")
