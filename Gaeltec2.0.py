@@ -1547,7 +1547,6 @@ if misc_df is not None:
             file_name="Pole_Work_Instructions.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
-
 from io import BytesIO
 from openpyxl.drawing.image import Image as XLImage
 
@@ -1600,7 +1599,13 @@ if filtered_df is not None and not filtered_df.empty:
                 .sum()
             )
 
-            pattern = re.escape(special_item.strip())
+            if not summary_df.empty:
+                general_summary = (summary_df.merge(export_df[["item_norm", "item"]],on="item_norm",how="left").drop_duplicates("item_norm")
+                                   .rename(columns={"item": "Description","Quantity_used": "Total Quantity"})[["Description", "Total Quantity"]])
+
+                # Ensure Comment column exists
+                general_summary["Comment"] = ""
+
             # Extract all rows for the special item
             special_df = export_df[export_df["item_norm"].str.contains(special_item_norm, na=False)].copy()
 
@@ -1709,6 +1714,9 @@ if filtered_df is not None and not filtered_df.empty:
         file_name="Gaeltec_Output.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+else:
+    st.info("Project or Segment Code columns not found in the data.")
 
 else:
     st.info("Project or Segment Code columns not found in the data.")
