@@ -1718,5 +1718,3 @@ if filtered_df is not None and not filtered_df.empty:
 else:
     st.info("Project or Segment Code columns not found in the data.")
 
-else:
-    st.info("Project or Segment Code columns not found in the data.")
