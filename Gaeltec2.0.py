@@ -2226,27 +2226,37 @@ st.header("🛠️ Works")
 
 if misc_df is not None and not misc_df.empty and not filtered_df.empty:
     # -----------------------------
-    # Data preparation
+    # Normalize and prepare columns
     # -----------------------------
-    filtered_df['item'] = filtered_df['item'].astype(str)
-    misc_df['column_1'] = misc_df['column_1'].astype(str)
-    misc_df['column_2'] = misc_df['column_2'].astype(str)
+    # Lowercase and strip column names for consistency
+    misc_df.columns = misc_df.columns.str.strip().str.lower()
+    filtered_df.columns = filtered_df.columns.str.strip().str.lower()
+
+    # Rename misc_df columns to match your mapping
+    misc_df.rename(columns={
+        'column_b': 'description',     # This is the key to match 'item'
+        'column_k': 'service_codes'    # This is the work instructions
+    }, inplace=True)
+
+    # Clean string columns
+    misc_df['description'] = misc_df['description'].astype(str).str.strip().str.lower()
+    misc_df['service_codes'] = misc_df['service_codes'].astype(str).str.strip()
+    filtered_df['item'] = filtered_df['item'].astype(str).str.strip().str.lower()
 
     # Keep only poles with valid values
     poles_df = filtered_df[
-        filtered_df['pole'].notna() & 
+        filtered_df['pole'].notna() &
         (filtered_df['pole'].astype(str).str.lower() != "nan")
     ].copy()
 
     # Merge filtered_df with misc_df to get Work instructions
     poles_df = poles_df.merge(
-        misc_df[['column_1', 'column_2']],
+        misc_df[['description', 'service_codes']],
         how='left',
         left_on='item',
-        right_on='column_1'
+        right_on='description'
     )
-
-    poles_df.rename(columns={'column_2': 'Work instructions'}, inplace=True)
+    poles_df.rename(columns={'service_codes': 'Work instructions'}, inplace=True)
 
     # Keep only rows with valid instructions, comments, and team_name
     poles_df_clean = poles_df.dropna(subset=['Work instructions', 'comment', 'team_name'])[
@@ -2287,6 +2297,7 @@ if misc_df is not None and not misc_df.empty and not filtered_df.empty:
         work_data = (
             poles_df_view['Work instructions']
             .astype(str)
+            .str.lower()
             .replace('nan', pd.NA)
             .dropna()
             .value_counts()
@@ -2310,8 +2321,6 @@ if misc_df is not None and not misc_df.empty and not filtered_df.empty:
             st.plotly_chart(fig_work, use_container_width=True)
         else:
             st.info("No valid work instructions available for the selected filters.")
-    else:
-        st.info("No data available for the selected filters.")
 
     # -----------------------------
     # 📄 Word export
@@ -2326,11 +2335,4 @@ if misc_df is not None and not misc_df.empty and not filtered_df.empty:
         )
 
 else:
-    st.info("No work data available.")
-
-# -----------------------------
-# General summary placeholder
-# -----------------------------
-general_summary = pd.DataFrame(
-    columns=["Description", "Total Quantity", "Comment"]
-)
+    st.info("No data available in either misc_df or filtered_df.")
