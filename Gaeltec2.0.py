@@ -2222,160 +2222,115 @@ if {'datetouse_dt', 'team_name', 'total'}.issubset(filtered_df.columns):
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-# -----------------------------
-# 🛠️ Works Section
-# -----------------------------
 st.header("🛠️ Works")
 
-if misc_df is not None:
-
+if misc_df is not None and not misc_df.empty and not filtered_df.empty:
     # -----------------------------
-    # 🔹 Data preparation (robust)
+    # Data preparation
     # -----------------------------
+    filtered_df['item'] = filtered_df['item'].astype(str)
+    misc_df['column_1'] = misc_df['column_1'].astype(str)
+    misc_df['column_2'] = misc_df['column_2'].astype(str)
 
-    # Normalize strings to prevent mapping issues
-    filtered_df['item'] = (
-        filtered_df['item']
-        .astype(str)
-        .str.strip()
-        .str.lower()
+    # Keep only poles with valid values
+    poles_df = filtered_df[
+        filtered_df['pole'].notna() & 
+        (filtered_df['pole'].astype(str).str.lower() != "nan")
+    ].copy()
+
+    # Merge filtered_df with misc_df to get Work instructions
+    poles_df = poles_df.merge(
+        misc_df[['column_1', 'column_2']],
+        how='left',
+        left_on='item',
+        right_on='column_1'
     )
 
-    misc_df['column_1'] = (
-        misc_df['column_1']
-        .astype(str)
-        .str.strip()
-        .str.lower()
-    )
+    poles_df.rename(columns={'column_2': 'Work instructions'}, inplace=True)
 
-    # Create mapping dictionary
-    item_to_column_i = (
-        misc_df
-        .set_index('column_1')['column_2']
-        .to_dict()
-    )
-
-    # Keep only rows with a real pole
-    poles_df = filtered_df[filtered_df['pole'].notna()].copy()
-
-    # Map work instructions
-    poles_df['Work instructions'] = poles_df['item'].map(item_to_column_i)
-
-    # Keep rows that have mapped instructions
-    poles_df_clean = poles_df.dropna(
-        subset=['Work instructions']
-    )[
+    # Keep only rows with valid instructions, comments, and team_name
+    poles_df_clean = poles_df.dropna(subset=['Work instructions', 'comment', 'team_name'])[
         ['pole', 'segmentcode', 'Work instructions', 'comment', 'team_name']
     ]
 
-    if poles_df_clean.empty:
-        st.info("No work data available for the selected filters.")
+    # -----------------------------
+    # 🔘 Segment selector
+    # -----------------------------
+    segment_options = ['All'] + sorted(poles_df_clean['segmentcode'].dropna().astype(str).unique())
+    selected_segment = st.selectbox("Select a segment code:", segment_options)
+
+    if selected_segment != 'All':
+        poles_df_view = poles_df_clean[poles_df_clean['segmentcode'].astype(str) == selected_segment]
     else:
+        poles_df_view = poles_df_clean.copy()
 
-        # -----------------------------
-        # 🔘 Segment selector
-        # -----------------------------
-        segment_options = ['All'] + sorted(
-            poles_df_clean['segmentcode']
-            .dropna()
+    # -----------------------------
+    # 🎯 Pole selector (Cascading)
+    # -----------------------------
+    pole_options = sorted(poles_df_view['pole'].dropna().astype(str).unique())
+    selected_pole = st.selectbox("Select a pole to view details:", ["All"] + pole_options)
+
+    # Filter by selected pole
+    if selected_pole != "All":
+        poles_df_view = poles_df_view[poles_df_view['pole'].astype(str) == selected_pole]
+
+    # Display pole details if one is selected
+    if selected_pole != "All" and not poles_df_view.empty:
+        st.write(f"Details for pole **{selected_pole}**:")
+        st.dataframe(poles_df_view)
+
+    # -----------------------------
+    # 📊 Pie chart (Works breakdown)
+    # -----------------------------
+    if not poles_df_view.empty:
+        # Count work instructions and remove NaN / empty strings
+        work_data = (
+            poles_df_view['Work instructions']
             .astype(str)
-            .unique()
+            .replace('nan', pd.NA)
+            .dropna()
+            .value_counts()
+            .reset_index()
         )
+        work_data.columns = ['Work instructions', 'total']
 
-        selected_segment = st.selectbox(
-            "Select a segment code:",
-            segment_options
-        )
-
-        if selected_segment != 'All':
-            poles_df_view = poles_df_clean[
-                poles_df_clean['segmentcode'].astype(str) == selected_segment
-            ]
+        if not work_data.empty:
+            fig_work = px.pie(
+                work_data,
+                names='Work instructions',
+                values='total',
+                hole=0.4
+            )
+            fig_work.update_traces(textinfo='percent+label', textfont_size=16)
+            fig_work.update_layout(
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                showlegend=False
+            )
+            st.plotly_chart(fig_work, use_container_width=True)
         else:
-            poles_df_view = poles_df_clean.copy()
+            st.info("No valid work instructions available for the selected filters.")
+    else:
+        st.info("No data available for the selected filters.")
 
-        # -----------------------------
-        # 🎯 Pole selector (Cascading)
-        # -----------------------------
-        pole_options = sorted(
-            poles_df_view['pole']
-            .dropna()
-            .astype(str)
-            .unique()
+    # -----------------------------
+    # 📄 Word export
+    # -----------------------------
+    if not poles_df_view.empty:
+        word_file = poles_to_word(poles_df_view)
+        st.download_button(
+            label="⬇️ Download Work Instructions (.docx)",
+            data=word_file,
+            file_name="Pole_Work_Instructions.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
 
-        selected_pole = st.selectbox(
-            "Select a pole to view details:",
-            ["All"] + pole_options
-        )
+else:
+    st.info("No work data available.")
 
-        if selected_pole != "All":
-            poles_df_view = poles_df_view[
-                poles_df_view['pole'].astype(str) == selected_pole
-            ]
-
-        # -----------------------------
-        # 📄 Pole details display
-        # -----------------------------
-        if selected_pole != "All" and not poles_df_view.empty:
-            st.write(f"Details for pole **{selected_pole}**:")
-            st.dataframe(poles_df_view)
-
-        # -----------------------------
-        # 📊 Pie chart (Works breakdown)
-        # -----------------------------
-        if not poles_df_view.empty:
-
-            work_data = (
-                poles_df_view['Work instructions']
-                .astype(str)
-                .str.strip()
-                .str.lower()
-                .replace('', pd.NA)
-                .dropna()
-                .value_counts()
-                .reset_index()
-            )
-
-            work_data.columns = ['Work instructions', 'total']
-
-            if not work_data.empty:
-                fig_work = px.pie(
-                    work_data,
-                    names='Work instructions',
-                    values='total',
-                    hole=0.4
-                )
-
-                fig_work.update_traces(
-                    textinfo='percent+label',
-                    textfont_size=16
-                )
-
-                fig_work.update_layout(
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    showlegend=False
-                )
-
-                st.plotly_chart(
-                    fig_work,
-                    use_container_width=True
-                )
-            else:
-                st.info(
-                    "No valid work instructions available for the selected filters."
-                )
-
-        # -----------------------------
-        # 📄 Word export
-        # -----------------------------
-        if not poles_df_view.empty:
-            word_file = poles_to_word(poles_df_view)
-
-            st.download_button(
-                label="⬇️ Download Work Instructions (.docx)",
-                data=word_file,
-                file_name="Pole_Work_Instructions.docx",
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            )
+# -----------------------------
+# General summary placeholder
+# -----------------------------
+general_summary = pd.DataFrame(
+    columns=["Description", "Total Quantity", "Comment"]
+)
