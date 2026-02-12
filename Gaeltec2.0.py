@@ -2222,41 +2222,22 @@ if {'datetouse_dt', 'team_name', 'total'}.issubset(filtered_df.columns):
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
+# -----------------------------
+# 🛠️ Works Section
+# -----------------------------
 st.header("🛠️ Works")
 
-if misc_df is not None and not misc_df.empty and not filtered_df.empty:
+if misc_df is not None:
     # -----------------------------
-    # Normalize and prepare columns
+    # Data preparation
     # -----------------------------
-    # Lowercase and strip column names for consistency
-    misc_df.columns = misc_df.columns.str.strip().str.lower()
-    filtered_df.columns = filtered_df.columns.str.strip().str.lower()
+    filtered_df['item'] = filtered_df['item'].astype(str)
+    misc_df['column_1'] = misc_df['column_1'].astype(str)
 
-    # Rename misc_df columns to match your mapping
-    misc_df.rename(columns={
-        'column_b': 'description',     # This is the key to match 'item'
-        'column_k': 'service_codes'    # This is the work instructions
-    }, inplace=True)
-
-    # Clean string columns
-    misc_df['description'] = misc_df['description'].astype(str).str.strip().str.lower()
-    misc_df['service_codes'] = misc_df['service_codes'].astype(str).str.strip()
-    filtered_df['item'] = filtered_df['item'].astype(str).str.strip().str.lower()
-
-    # Keep only poles with valid values
-    poles_df = filtered_df[
-        filtered_df['pole'].notna() &
-        (filtered_df['pole'].astype(str).str.lower() != "nan")
-    ].copy()
-
-    # Merge filtered_df with misc_df to get Work instructions
-    poles_df = poles_df.merge(
-        misc_df[['description', 'service_codes']],
-        how='left',
-        left_on='item',
-        right_on='description'
-    )
-    poles_df.rename(columns={'service_codes': 'Work instructions'}, inplace=True)
+    # Map items to work instructions
+    item_to_column_i = misc_df.set_index('column_1')['column_2'].to_dict()
+    poles_df = filtered_df[filtered_df['pole'].notna() & (filtered_df['pole'].astype(str).str.lower() != "nan")].copy()
+    poles_df['Work instructions'] = poles_df['item'].map(item_to_column_i)
 
     # Keep only rows with valid instructions, comments, and team_name
     poles_df_clean = poles_df.dropna(subset=['Work instructions', 'comment', 'team_name'])[
@@ -2292,6 +2273,7 @@ if misc_df is not None and not misc_df.empty and not filtered_df.empty:
     # -----------------------------
     # 📊 Pie chart (Works breakdown)
     # -----------------------------
+
     if not poles_df_view.empty:
         # Count work instructions and remove NaN / empty strings
         work_data = (
@@ -2299,7 +2281,7 @@ if misc_df is not None and not misc_df.empty and not filtered_df.empty:
             .astype(str)
             .str.lower()
             .replace('nan', pd.NA)
-            .dropna()
+            .dropna()  # remove NaN
             .value_counts()
             .reset_index()
         )
@@ -2313,15 +2295,10 @@ if misc_df is not None and not misc_df.empty and not filtered_df.empty:
                 hole=0.4
             )
             fig_work.update_traces(textinfo='percent+label', textfont_size=16)
-            fig_work.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                showlegend=False
-            )
+            fig_work.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', showlegend=False)
             st.plotly_chart(fig_work, use_container_width=True)
         else:
             st.info("No valid work instructions available for the selected filters.")
-
     # -----------------------------
     # 📄 Word export
     # -----------------------------
@@ -2334,5 +2311,6 @@ if misc_df is not None and not misc_df.empty and not filtered_df.empty:
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         )
 
-else:
-    st.info("No data available in either misc_df or filtered_df.")
+general_summary = pd.DataFrame(
+    columns=["Description", "Total Quantity", "Comment"]
+)
