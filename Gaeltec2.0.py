@@ -1437,7 +1437,7 @@ if filtered_df is not None and not filtered_df.empty:
 
         cols_to_include = [
             "item","comment", "Quantity_original", "Quantity_used", "material_code",
-            "type", "pole", "Date","done_display", "District", "project",
+            "type", "pole", "datetouse_dt","done_display", "District", "project",
             "Project Manager", "Circuit", "Segment",
             "team lider", "PID", "sourcefile"
         ]
