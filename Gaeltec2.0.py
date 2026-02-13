@@ -1070,7 +1070,7 @@ if filtered_df is not None and not filtered_df.empty:
             "item","comment", "Quantity_original", "Quantity_used", "material_code",
             "type", "pole", "datetouse_dt","done_display", "District", "project",
             "Project Manager", "Circuit", "Segment",
-            "team lider", "PID", "sourcefile"
+            "team lider","total", "PID", "sourcefile"
         ]
         cols_to_include = [c for c in cols_to_include if c in export_df.columns]
         export_df = export_df[cols_to_include]
