@@ -601,7 +601,6 @@ poles_replaced_keys = {
     "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions":"Recover H pole"
 }
 
-}
 
 # --- Transformer Mappings ---
 transformer_keys = {
