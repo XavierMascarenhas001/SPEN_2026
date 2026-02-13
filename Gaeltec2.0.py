@@ -1081,73 +1081,88 @@ if filtered_df is not None and not filtered_df.empty:
 
         # ---- Summary sheet ----
         if "Quantity_used" in export_df.columns:
-            # Ensure numeric type
-            # Apply normalization
+
+            # Ensure numeric
             export_df["Quantity_used"] = pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0)
-            special_item = (
-                "Erect 11kV Remote Controlled Switch Disconnector (Soule Auguste) or Auto Reclosure unit c/w VT, Aerial, RTU & umbilical cable."
-            )
+
+            # Normalize items
             export_df["item_norm"] = export_df["item"].apply(normalize_item)
-            summary_items_norm = [normalize_item(i) for i in summary_items]
-            special_item_norm = normalize_item(special_item)
-                # Add comments column for the special item
-            # Aggregate sum by item
-            summary_df = (
-                export_df[export_df["item_norm"].isin(summary_items_norm)]
-                .groupby(["item_norm", "done_display"], as_index=False)["Quantity_used"]
-                .sum()
-            )
 
-            if not summary_df.empty:
-                general_summary = (summary_df.merge(export_df[["item_norm", "item"]],on="item_norm",how="left").drop_duplicates("item_norm")
-                                   .rename(columns={"item": "Description","Quantity_used": "Total Quantity"})[["Description", "Total Quantity"]])
+            # Normalize key lists
+            erect_norm = [normalize_item(i) for i in pole_erected_keys]
+            recover_norm = [normalize_item(i) for i in poles_replaced_key]
+            conductor_hv_norm = [normalize_item(i) for i in conductor_keys]
+            conductor_lv_norm = [normalize_item(i) for i in conductor_2_keys]
 
-                # Ensure Comment column exists
-                general_summary["Comment"] = ""
+            # Transformer mappings
+            tx_1ph_keys = [
+                normalize_item("Transformer 1ph 50kVA"),
+                normalize_item("Transformer 1ph 100kVA"),
+                normalize_item("Transformer 1ph 25kVA"),
+            ]
 
-            # Extract all rows for the special item
-            special_df = export_df[export_df["item_norm"].str.contains(special_item_norm, na=False)].copy()
+            tx_3ph_keys = [
+                normalize_item("Transformer 3ph 50kVA"),
+                normalize_item("Transformer 3ph 200kVA"),
+                normalize_item("Transformer 3ph 100kVA"),
+            ]
 
-            if not special_df.empty:
-                # Group by unique comment and sum quantities
-                special_summary = (
-                    special_df.groupby(["item", "Manufacturer", "done_display"], as_index=False)["Quantity_used"]
-                    .sum()
-                    .rename(columns={"item": "Description", "Quantity_used": "Total Quantity", "comment": "Comment","done_display": "Done Date"})
-                    )
+            # --- Build summary per project ---
+            summary_rows = []
 
-                # --- Normalise comment safely ---
-                special_df["comment_clean"] = (
-                special_df["comment"]
-                .fillna("")
-                .str.lower()
-                .str.strip()
-                )
-                # --- Classify manufacturer ---
-                def classify_switch(comment):
-                    if not isinstance(comment, str):
-                        return "Unknown"
-                    comment = comment.lower()
-                    if re.search(r"\bsoule\b", comment):
-                        return "Soule"
-                    elif re.search(r"\bnoja\b", comment):
-                        return "Noja"
-                    else:
-                        return "Unknown"
+            for project, df_proj in export_df.groupby("project"):
 
-                special_df["Manufacturer"] = special_df["comment_clean"].apply(classify_switch)
+                # ERECT POLES
+                erect_poles = df_proj[df_proj["item_norm"].isin(erect_norm)]["Quantity_used"].sum()
 
-                # --- Aggregate ---
-                special_summary = (special_df.groupby(["item", "Manufacturer"], as_index=False)["Quantity_used"]
-                                   .sum().rename(columns={"item": "Description","Quantity_used": "Total Quantity","Manufacturer": "Comment",}))
+                # RECOVER POLES
+                recover_poles = df_proj[df_proj["item_norm"].isin(recover_norm)]["Quantity_used"].sum()
 
-            else:
-                special_summary = pd.DataFrame(columns=["Description", "Total Quantity", "Comment"])
+                # POLES REFURB (not erect and not recover, but pole-related)
+                pole_related = df_proj[
+                    df_proj["item_norm"].isin(erect_norm + recover_norm)
+                ]
 
-            # Append special item summary (multiple rows per comment)
-            final_summary = pd.concat([general_summary, special_summary], ignore_index=True, sort=False)
+                total_pole_activity = df_proj[
+                    df_proj["item_norm"].str.contains("pole", na=False)
+                ]["Quantity_used"].sum()
+            
+                poles_refurb = total_pole_activity - erect_poles - recover_poles
+                poles_refurb = max(poles_refurb, 0)
 
-            # Write summary sheet
+                # TRANSFORMERS
+                pte_1ph = df_proj[df_proj["item_norm"].isin(tx_1ph_keys)]["Quantity_used"].sum()
+                pte_3ph = df_proj[df_proj["item_norm"].isin(tx_3ph_keys)]["Quantity_used"].sum()
+
+                # CONDUCTORS
+                conductor_hv = df_proj[df_proj["item_norm"].isin(conductor_hv_norm)]["Quantity_used"].sum()
+                conductor_lv = df_proj[df_proj["item_norm"].isin(conductor_lv_norm)]["Quantity_used"].sum()
+
+                # VALUE (if exists)
+                if "value" in df_proj.columns:
+                    total_value = pd.to_numeric(df_proj["value"], errors="coerce").fillna(0).sum()
+                else:
+                    total_value = 0
+
+                summary_rows.append({
+                    "Project": project,
+                    "Erect Poles": erect_poles,
+                    "Recover Poles": recover_poles,
+                    "Poles Refurb": poles_refurb,
+                    "PTE Installed 1ph": pte_1ph,
+                    "PTE Installed 3ph": pte_3ph,
+                    "Conductor HV Installed (Km)": conductor_hv,
+                    "Conductor LV Installed (Km)": conductor_lv,
+                    "Value": total_value
+                })
+
+            # Create DataFrame
+            final_summary = pd.DataFrame(summary_rows)
+
+            # Sort by project
+            final_summary = final_summary.sort_values("Project")
+
+            # Write to Excel
             final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1)
             ws_summary = writer.book["Summary"]
 
