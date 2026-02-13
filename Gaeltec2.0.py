@@ -836,6 +836,14 @@ if master_file is not None:
     agg_view = df.copy()
 
 # -------------------------------
+# Date Source Selector
+# -------------------------------
+date_source = st.sidebar.radio(
+    "Select Date Source",
+    ["Planned + Done (datetouse)", "Done Only (done)"]
+)
+
+# -------------------------------
 # --- Team Filter (GLOBAL) ---
 # -------------------------------
 base_df = None
@@ -872,13 +880,6 @@ if base_df is None:
     st.info("Please upload Master.parquet to continue.")
     st.stop()
 
-# -------------------------------
-# Date Source Selector
-# -------------------------------
-date_source = st.sidebar.radio(
-    "Select Date Source",
-    ["Planned + Done (datetouse)", "Done Only (done)"]
-)
 # -------------------------------
 # Sidebar Filters
 # -------------------------------
