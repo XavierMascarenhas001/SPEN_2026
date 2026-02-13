@@ -1090,7 +1090,7 @@ if filtered_df is not None and not filtered_df.empty:
 
             # Normalize key lists
             erect_norm = [normalize_item(i) for i in pole_erected_keys]
-            recover_norm = [normalize_item(i) for i in poles_replaced_key]
+            recover_norm = [normalize_item(i) for i in poles_replaced_keys]
             conductor_hv_norm = [normalize_item(i) for i in conductor_keys]
             conductor_lv_norm = [normalize_item(i) for i in conductor_2_keys]
 
