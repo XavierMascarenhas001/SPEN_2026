@@ -1170,7 +1170,7 @@ if filtered_df is not None and not filtered_df.empty:
 
                 # VALUE (if exists)
                 if "total" in df_proj.columns:
-                    total_value = pd.to_numeric(df_proj["value"], errors="coerce").fillna(0).sum()
+                    total_value = pd.to_numeric(df_proj["total"], errors="coerce").fillna(0).sum()
                 else:
                     total_value = 0
 
