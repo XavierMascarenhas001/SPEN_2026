@@ -1187,7 +1187,7 @@ if filtered_df is not None and not filtered_df.empty:
                     "Soule": soule_sum,
                     "ABSW": absw_sum,
                     "11 kV fuse": fuse_11kv_sum,
-                    "Value": total_value
+                    "Total Value (£)": total_value
                 })
 
             # Create DataFrame
@@ -1197,7 +1197,12 @@ if filtered_df is not None and not filtered_df.empty:
             final_summary = final_summary.sort_values("Project")
 
             # Write to Excel
-            final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1)
+            # --- Add Total Row ---
+            total_row = final_summary.select_dtypes(include='number').sum().to_dict()
+            total_row["Project"] = "Total"  # Label for the total row
+
+            # Append total row
+            final_summary = pd.concat([final_summary, pd.DataFrame([total_row])], ignore_index=True)
             ws_summary = writer.book["Summary"]
 
         # ---- Formatting styles ----
