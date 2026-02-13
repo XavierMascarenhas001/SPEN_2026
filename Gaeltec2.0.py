@@ -1119,13 +1119,29 @@ if filtered_df is not None and not filtered_df.empty:
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_norm)]["Quantity_used"].sum()
 
                 # POLES REFURB (not erect and not recover, but pole-related)
-                pole_related = df_proj[
-                    df_proj["item_norm"].isin(erect_norm + recover_norm)
-                ]
+                pole_series = df_proj["pole"].dropna().astype(str).str.strip()
+                # Unique poles in project
+                all_poles_set = set(pole_series)
 
-                total_pole_activity = df_proj[
-                    df_proj["item_norm"].str.contains("pole", na=False)
-                ]["Quantity_used"].sum()
+                # Poles used in Erect
+                erect_poles_set = set(
+                    df_proj[df_proj["item_norm"].isin(erect_norm)]["pole"]
+                    .dropna()
+                    .astype(str)
+                    .str.strip()
+                )
+
+                # Poles used in Recover
+                recover_poles_set = set(
+                    df_proj[df_proj["item_norm"].isin(recover_norm)]["pole"]
+                    .dropna()
+                    .astype(str)
+                    .str.strip()
+                )
+
+                # Poles Refurb = poles NOT in Erect nor Recover
+                refurb_poles_set = all_poles_set - erect_poles_set - recover_poles_set
+                poles_refurb = len(refurb_poles_set)
             
                 poles_refurb = total_pole_activity - erect_poles - recover_poles
                 poles_refurb = max(poles_refurb, 0)
@@ -1139,10 +1155,28 @@ if filtered_df is not None and not filtered_df.empty:
                 conductor_lv = df_proj[df_proj["item_norm"].isin(conductor_lv_norm)]["Quantity_used"].sum()
 
                 # VALUE (if exists)
-                if "value" in df_proj.columns:
+                if "total" in df_proj.columns:
                     total_value = pd.to_numeric(df_proj["value"], errors="coerce").fillna(0).sum()
                 else:
                     total_value = 0
+
+                # --- NEW TASK COLUMNS ---
+                noja_keys = [normalize_item("Noja"), normalize_item("0.5 kVa Tx for Noja")]
+                soule_keys = [normalize_item("11kV PMSW (Soule)")]
+                absw_keys = [
+                    normalize_item("11kv ABSW Hookstick Standard"),
+                    normalize_item("11kv ABSW Hookstick Spring loaded mech"),
+                    normalize_item("33kv ABSW Hookstick Dependant")
+                ]
+                fuse_11kv_keys = [
+                    normalize_item("Erect 3.ph fuse units at single tee off pole or in line pole."),
+                    normalize_item("Erect 1.ph fuse units at single tee off pole or in line pole.")
+                ]
+
+                noja_sum = df_proj[df_proj["item_norm"].isin(noja_keys)]["Quantity_used"].sum()
+                soule_sum = df_proj[df_proj["item_norm"].isin(soule_keys)]["Quantity_used"].sum()
+                absw_sum = df_proj[df_proj["item_norm"].isin(absw_keys)]["Quantity_used"].sum()
+                fuse_11kv_sum = df_proj[df_proj["item_norm"].isin(fuse_11kv_keys)]["Quantity_used"].sum()
 
                 summary_rows.append({
                     "Project": project,
@@ -1153,7 +1187,7 @@ if filtered_df is not None and not filtered_df.empty:
                     "PTE Installed 3ph": pte_3ph,
                     "Conductor HV Installed (Km)": conductor_hv,
                     "Conductor LV Installed (Km)": conductor_lv,
-                    "Value": total_value
+                    "total": total_value
                 })
 
             # Create DataFrame
