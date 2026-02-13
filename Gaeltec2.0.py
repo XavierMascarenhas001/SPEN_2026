@@ -589,79 +589,6 @@ file_project_mapping = {
     "33kv rebuilt": ["Lanark", "33kV Rebuilt"]
 }
 
-# --- Pole Mappings (dictionary style, includes new additions) ---
-pole_keys = {
-    "9x220 BIOCIDE LV POLE": "9m B",
-    "9x275 BIOCIDE LV POLE": "9s B",
-    "9x220 CREOSOTE LV POLE": "9m",
-    "9x275 CREOSOTE LV POLE": "9s",
-    "9x220 HV SINGLE POLE": "9m",
-    "9x275 HV SINGLE POLE": "9s",
-    "9x295 HV SINGLE POLE": "9es",
-    "9x315 HV SINGLE POLE": "9esp",
-    "10x230 BIOCIDE LV POLE": "10m B",
-    "10x230 HV SINGLE POLE": "10m",
-    "10x285 BIOCIDE LV POLE": "10s B",
-    "10x285 H POLE HV Creosote": "10s",
-    "10x285 HV SINGLE POLE": "10s",
-    "10x305 HV SINGLE POLE": "10es",
-    "11x295 HV SINGLE POLE": "11s",
-    "11x295 H POLE HV Creosote": "11s",
-    "11x295 BIOCIDE LV POLE": "11sB",
-    "12x250 BIOCIDE LV POLE": "12m B",
-    "12x305 BIOCIDE LV POLE": "12s B",
-    "12x250 CREOSOTE LV POLE": "12m",
-    "12x305 CREOSOTE LV POLE": "12s",
-    "12x305 H POLE HV Creosote":"12s",
-    "12x250 HV SINGLE POLE": "12m",
-    "12x305 HV SINGLE POLE": "12s",
-    "12x325 HV SINGLE POLE": "12es",
-    "12x345 HV SINGLE POLE": "12esp",
-    "13x260 BIOCIDE LV POLE": "13m B",
-    "13x320 BIOCIDE LV POLE": "13s B",
-    "13x260 CREOSOTE LV POLE": "13m",
-    "13x320 CREOSOTE LV POLE": "13s",
-    "13x260 HV SINGLE POLE": "13m",
-    "13x320 HV SINGLE POLE": "13s",
-    "13x340 HV SINGLE POLE": "13es",
-    "13x365 HV SINGLE POLE": "13esp",
-    "14x275 BIOCIDE LV POLE": "14m B",
-    "14x335 BIOCIDE LV POLE": "14s B",
-    "14x275 CREOSOTE LV POLE": "14m",
-    "14x335 CREOSOTE LV POLE": "14s",
-    "14x275 HV SINGLE POLE": "14m",
-    "14x335 HV SINGLE POLE": "14s",
-    "14x355 HV SINGLE POLE": "14es",
-    "14x375 HV SINGLE POLE": "14esp",
-    "16x305 BIOCIDE LV POLE": "16m B",
-    "16x365 BIOCIDE LV POLE": "16s B",
-    "16x305 CREOSOTE LV POLE": "16m",
-    "16x365 CREOSOTE LV POLE": "16s",
-    "16x305 HV SINGLE POLE": "16m",
-    "16x365 HV SINGLE POLE": "16s",
-    "16x385 HV SINGLE POLE": "16es",
-    "16x405 HV SINGLE POLE": "16esp",
-    "11x315 H POLE HV Creosote":"11es",
-    "14x335 H POLE HV Creosote":"14s",
-    "11x315 HV SINGLE POLE":"11es",
-    "13x320 H POLE HV Creosote":"13s",
-    "11x240 CREOSOTE LV POLE":"11",
-    "11x240 HV SINGLE POLE":"11m",
-    "10x230 CREOSOTE LV POLE":"10m",
-    "11x335 H POLE HV Creosote":"11esp",
-    "10x305 H POLE HV Creosote":"10es",
-    "11x240 BIOCIDE LV POLE":"11m B",
-    "16x365 H POLE HV Creosote":"16s",
-    "16x405 EHV SINGLE POLE CREOSOTE":"16esp",
-    "12x325 H POLE HV Creosote":"12es",
-    "16x385 H POLE HV Creosote":"16es",
-    "12x305 EHV SINGLE POLE CREOSOTE":"12s",
-    "13x340 EHV SINGLE POLE CREOSOTE":"13es",
-    "11x335 EHV SINGLE POLE CREOSOTE":"11es",
-    "11x315 EHV SINGLE POLE CREOSOTE":"11es",
-    "12x325 EHV SINGLE POLE CREOSOTE":"12es"
-}
-
 pole_erected_keys = {
     "Erect Single HV/EHV Pole, up to and including 12 metre pole":"Erect HV pole", 
     "Erect Single HV/EHV Pole, up to and including 12 metre pole.":"Erect HV pole",
@@ -674,65 +601,6 @@ poles_replaced_keys = {
     "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions":"Recover H pole"
 }
 
-# --- Equipment / Conductor Mappings ---
-equipment_keys = {
-    "Hazel - 50mm² AAAC bare (1000m drums)": "Hazel 50mm² (1000m drums)",
-    "Oak - 100mm² AAAC bare (1000m drums)": "Oak 100mm² (1000m drums)",
-    "Ash - 150mm² AAAC bare (1000m drums)": "Ash 150mm² (1000m drums)",
-    "Poplar - 200mm² AAAC bare (1000m drums)": "Poplar 200mm² (1000m drums)",
-    "Upas - 300mm² AAAC bare (1000m drums)": "Upas 300mm² (1000m drums)",
-    "Poplar OPPC - 200mm² AAAC equivalent bare": "Poplar OPPC 200mm²",
-    "Upas OPPC - 300mm² AAAC equivalent bare": "Upas OPPC 300mm²",
-    # ACSR
-    "Gopher - 25mm² ACSR bare (1000m drums)": "Gopher 25mm² (1000m drums)",
-    "Caton - 25mm² Compacted ACSR bare (1000m drums)": "Caton 25mm² (1000m drums)",
-    "Rabbit - 50mm² ACSR bare (1000m drums)": "Rabbit 50mm² (1000m drums)",
-    "Wolf - 150mm² ACSR bare (1000m drums)": "Wolf 150mm² (1000m drums)",
-    "Horse - 70mm² ACSR bare": "Horse 70mm²",
-    "Dog - 100mm² ACSR bare (1000m drums)": "Dog 100mm² (1000m drums)",
-    "Dingo - 150mm² ACSR bare (1000m drums)": "Dingo 150mm² (1000m drums)",
-    # Copper
-    "Hard Drawn Copper 16mm² ( 3/2.65mm ) (500m drums)": "Copper 16mm² (500m drums)",
-    "Hard Drawn Copper 32mm² ( 3/3.75mm ) (1000m drums)": "Copper 32mm² (500m drums)",
-    "Hard Drawn Copper 70mm² (500m drums)": "Copper 70mm² (500m drums)",
-    "Hard Drawn Copper 100mm² (500m drums)": "Copper 100mm² (500m drums)",
-    # PVC covered
-    "35mm² Copper (Green / Yellow PVC covered) (50m drums)": "Copper 35mm² GY PVC (50m drums)",
-    "70mm² Copper (Green / Yellow PVC covered) (50m drums)": "Copper 70mm² GY PVC (50m drums)",
-    "35mm² Copper (Blue PVC covered) (50m drums)": "Copper 35mm² Blue PVC (50m drums)",
-    "70mm² Copper (Blue PVC covered) (50m drums)": "Copper 70mm² Blue PVC (50m drums)",
-    # Double insulated
-    "35mm² Double Insulated (Brown) (50m drums)": "Double Insulated 35mm² Brown (50m drums)",
-    "35mm² Double Insulated (Blue) (50m drums)": "Double Insulated 35mm² Blue (50m drums)",
-    "70mm² Double Insulated (Brown) (50m drums)": "Double Insulated 70mm² Brown (50m drums)",
-    "70mm² Double Insulated (Blue) (50m drums)": "Double Insulated 70mm² Blue (50m drums)",
-    "120mm² Double Insulated (Brown) (50m drums)": "Double Insulated 120mm² Brown (50m drums)",
-    "120mm² Double Insulated (Blue) (50m drums)": "Double Insulated 120mm² Blue (50m drums)",
-    # LV cables
-    "LV Cable 1ph 4mm Concentric (250m drums)": "LV 1ph 4mm Concentric (250m drums)",
-    "LV Cable 1ph 25mm CNE (250m drums)": "LV 1ph 25mm CNE (250m drums)",
-    "LV Cable 1ph 25mm SNE (100m drums)": "LV 1ph 25mm SNE (100m drums)",
-    "LV Cable 1ph 35mm CNE (250m drums)": "LV 1ph 35mm CNE (250m drums)",
-    "LV Cable 1ph 35mm SNE (100m drums)": "LV 1ph 35mm SNE (100m drums)",
-    "LV Cable 3ph 35mm Cu Split Con (250m drums)": "LV 3ph 35mm Cu Split Con (250m drums)",
-    "LV Cable 3ph 35mm SNE (250m drums)": "LV 3ph 35mm SNE (250m drums)",
-    "LV Cable 3ph 35mm CNE (250m drums)": "LV 3ph 35mm CNE (250m drums)",
-    "LV Cable 3ph 35mm CNE Al (LSOH) (250m drums)": "LV 3ph 35mm CNE Al LSOH (250m drums)",
-    "LV Cable 3c 95mm W/F (250m drums)": "LV 3c 95mm W/F (250m drums)",
-    "LV Cable 3c 185mm W/F (250m drums)": "LV 3c 185mm W/F (250m drums)",
-    "LV Cable 3c 300mm W/F (250m drums)": "LV 3c 300mm W/F (250m drums)",
-    "LV Cable 4c 95mm W/F (250m drums)": "LV 4c 95mm W/F (250m drums)",
-    "LV Cable 4c 185mm W/F (250m drums)": "LV 4c 185mm W/F (250m drums)",
-    "LV Cable 4c 240mm W/F (250m drums)": "LV 4c 240mm W/F (250m drums)",
-    "LV Marker Tape (365m roll)": "LV Marker Tape (365m roll)",
-    # 11kV
-    "11kv Cable 95mm 3c Poly (250m drums)": "11kV 3c 95mm Poly (250m drums)",
-    "11kv Cable 185mm 3c Poly (250m drums)": "11kV 3c 185mm Poly (250m drums)",
-    "11kv Cable 300mm 3c Poly (250m drums)": "11kV 3c 300mm Poly (250m drums)",
-    "11kv Cable 95mm 1c Poly (250m drums)": "11kV 1c 95mm Poly (250m drums)",
-    "11kv Cable 185mm 1c Poly (250m drums)": "11kV 1c 185mm Poly (250m drums)",
-    "11kv Cable 300mm 1c Poly (250m drums)": "11kV 1c 300mm Poly (250m drums)",
-    "11kV Marker Tape (40m roll)": "11kV Marker Tape (40m roll)"
 }
 
 # --- Transformer Mappings ---
@@ -762,51 +630,22 @@ conductor_keys = {
     "Horse - 70mm² ACSR bare": "Horse 70mm²",
     "Dog - 100mm² ACSR bare (1000m drums)": "Dog 100mm²",
     "Dingo - 150mm² ACSR bare (1000m drums)": "Dingo 150mm²",
-    # Copper
-    "Hard Drawn Copper 16mm² ( 3/2.65mm ) (500m drums)": "Copper 16mm²",
-    "Hard Drawn Copper 32mm² ( 3/3.75mm ) (1000m drums)": "Copper 32mm²",
-    "Hard Drawn Copper 70mm² (500m drums)": "Copper 70mm²",
-    "Hard Drawn Copper 100mm² (500m drums)": "Copper 100mm²",
-    # PVC covered
-    "35mm² Copper (Green / Yellow PVC covered) (50m drums)": "Copper 35mm² GY PVC",
-    "70mm² Copper (Green / Yellow PVC covered) (50m drums)": "Copper 70mm² GY PVC",
-    "35mm² Copper (Blue PVC covered) (50m drums)": "Copper 35mm² Blue PVC",
-    "70mm² Copper (Blue PVC covered) (50m drums)": "Copper 70mm² Blue PVC",
-    # Double insulated
-    "35mm² Double Insulated (Brown) (50m drums)": "Double Insulated 35mm² Brown",
-    "35mm² Double Insulated (Blue) (50m drums)": "Double Insulated 35mm² Blue",
-    "70mm² Double Insulated (Brown) (50m drums)": "Double Insulated 70mm² Brown",
-    "70mm² Double Insulated (Blue) (50m drums)": "Double Insulated 70mm² Blue",
-    "120mm² Double Insulated (Brown) (50m drums)": "Double Insulated 120mm² Brown",
-    "120mm² Double Insulated (Blue) (50m drums)": "Double Insulated 120mm² Blue"
 }
 
     # LV cables per meter
 conductor_2_keys = {
-    "LV Cable 1ph 4mm Concentric (250m drums)": "LV 1ph 4mm Concentric",
-    "LV Cable 1ph 25mm CNE (250m drums)": "LV 1ph 25mm CNE",
-    "LV Cable 1ph 25mm SNE (100m drums)": "LV 1ph 25mm SNE",
-    "LV Cable 1ph 35mm CNE (250m drums)": "LV 1ph 35mm CNE",
-    "LV Cable 1ph 35mm SNE (100m drums)": "LV 1ph 35mm SNE",
-    "LV Cable 3ph 35mm Cu Split Con (250m drums)": "LV 3ph 35mm Cu Split Con",
-    "LV Cable 3ph 35mm SNE (250m drums)": "LV 3ph 35mm SNE",
-    "LV Cable 3ph 35mm CNE (250m drums)": "LV 3ph 35mm CNE",
-    "LV Cable 3ph 35mm CNE Al (LSOH) (250m drums)": "LV 3ph 35mm CNE Al LSOH",
-    "LV Cable 3c 95mm W/F (250m drums)": "LV 3c 95mm W/F",
-    "LV Cable 3c 185mm W/F (250m drums)": "LV 3c 185mm W/F",
-    "LV Cable 3c 300mm W/F (250m drums)": "LV 3c 300mm W/F",
-    "LV Cable 4c 95mm W/F (250m drums)": "LV 4c 95mm W/F",
-    "LV Cable 4c 185mm W/F (250m drums)": "LV 4c 185mm W/F",
-    "LV Cable 4c 240mm W/F (250m drums)": "LV 4c 240mm W/F",
-    "LV Marker Tape (365m roll)": "LV Marker Tape",
-    # 11kV
-    "11kv Cable 95mm 3c Poly (250m drums)": "11kV 3c 95mm Poly",
-    "11kv Cable 185mm 3c Poly (250m drums)": "11kV 3c 185mm Poly",
-    "11kv Cable 300mm 3c Poly (250m drums)": "11kV 3c 300mm Poly",
-    "11kv Cable 95mm 1c Poly (250m drums)": "11kV 1c 95mm Poly",
-    "11kv Cable 185mm 1c Poly (250m drums)": "11kV 1c 185mm Poly",
-    "11kv Cable 300mm 1c Poly (250m drums)": "11kV 1c 300mm Poly",
-    "11kV Marker Tape (40m roll)": "11kV Marker Tape"
+    "ABC 2 core x 35mm² + 25mm² bare earth (250m drums)": "ABC 2 core x 35mm² + 25mm² bare earth (250m drums)",
+    "ABC 4 core x 35mm² + 25mm² bare earth (250m drums)": "ABC 4 core x 35mm² + 25mm² bare earth (250m drums)",
+    "ABC 2 core x 35mm² (250m drums)": "ABC 2 core x 50mm² (250m drums)",
+    "ABC 2 core x 50mm² (250m drums)": "ABC 2 core x 50mm² (250m drums)",
+    "ABC 2 core x 95mm² + 50mm² bare earth  (300m drums)": "ABC 2 core x 95mm² + 50mm² bare earth  (300m drums)",
+    "ABC 4 core x 35mm² (250m drums)": "ABC 4 core x 35mm² (250m drums)",
+    "ABC 4 core x 50mm² (250m drums)": "ABC 4 core x 50mm² (250m drums)",
+    "ABC 4 core x 95mm² (250m drums)": "ABC 4 core x 95mm² (250m drums)",
+    "ABC 2 core x 50mm² + 50mm² bare earth  (300m drums)": "ABC 2 core x 50mm² + 50mm² bare earth  (300m drums)",
+    "ABC 4 core x 50mm² + 50mm² bare earth  (300m drums)": "ABC 4 core x 50mm² + 50mm² bare earth  (300m drums)",
+    "ABC 4 core x 95mm² + 50mm² bare earth (300m drums)": "ABC 4 core x 95mm² + 50mm² bare earth (300m drums)",
+    "ABC 2 core x 95mm² + 50mm² bare earth  (300m drums)": "ABC 2 core x 95mm² + 50mm² bare earth  (300m drums)",
 }
 
 
@@ -816,35 +655,6 @@ equipment_keys = {
     "11kv ABSW Hookstick Standard": "11kv ABSW Hookstick Standard",
     "11kv ABSW Hookstick Spring loaded mech": "11kv ABSW Hookstick Spring loaded mech",
     "33kv ABSW Hookstick Dependant": "33kv ABSW Hookstick Dependant",
-    "100A LV Fuse JPU 82.5mm": "100A LV Fuse JPU 82.5mm",
-    "160A LV Fuse JPU 82.5mm": "160A LV Fuse JPU 82.5mm",
-    "200A LV Fuse JPU 82.5mm": "200A LV Fuse JPU 82.5mm",
-    "315A LV Fuse JPU 82.5mm": "315A LV Fuse JPU 82.5mm",
-    "400A LV Fuse JPU 82.5mm": "400A LV Fuse JPU 82.5mm",
-    "200A LV Fuse JSU 92mm": "200A LV Fuse JSU 92mm",
-    "315A LV Fuse JSU 92mm": "315A LV Fuse JSU 92mm",
-    "400A LV Fuse JSU 92mm": "400A LV Fuse JSU 92mm",
-    "100A LV Fuse - Porcelain screw-in": "100A LV Fuse - Porcelain screw-in",
-    "160A LV Fuse - Porcelain screw-in": "160A LV Fuse - Porcelain screw-in",
-    "200A LV Fuse - Porcelain screw-in": "200A LV Fuse - Porcelain screw-in",
-    "Single Phase cut out kit 100A Henley Series 7": "Single Phase cut out kit 100A Henley Series 7",
-    "Single Phase SNE Sealing Chamber": "Single Phase SNE Sealing Chamber",
-    "Three Phase cut out kit 100A Henley Series 7": "Three Phase cut out kit 100A Henley Series 7",
-    "Three Phase 200A Cut out": "Three Phase 200A Cut out",
-    "Earth Connector Block 100A 5 Way": "Earth Connector Block 100A 5 Way",
-    "Cut out Fuse (MF) 60A": "Cut out Fuse (MF) 60A",
-    "Cut out Fuse (MF) 80A": "Cut out Fuse (MF) 80A",
-    "Cut out Fuse (MF) 100A": "Cut out Fuse (MF) 100A",
-    "Temporary Meter seal white plastic (100)": "Temporary Meter seal white plastic (100)",
-    "Meter seals for use with sealing pliers (100)": "Meter seals for use with sealing pliers (100)",
-    "Meter sealing wire 200mm long (each)": "Meter sealing wire 200mm long (each)",
-    "ABC 1PH & 3PH TERM BOX": "ABC 1PH & 3PH TERM BOX",
-    "SINGLE PHASE FUSED ABC BOX": "SINGLE PHASE FUSED ABC BOX",
-    "1PH & 3PH FUSED SERV WALL BOX": "1PH & 3PH FUSED SERV WALL BOX",
-    "25mm Galvanised Conduit": "25mm Galvanised Conduit",
-    "25mm Galvanised Conduit saddles": "25mm Galvanised Conduit saddles",
-    "Street Lighting Cut out CNE": "Street Lighting Cut out CNE",
-    "Street Lighting Cut out SNE": "Street Lighting Cut out SNE",
     "11KV FUSE UNIT - C-TYPE": "11KV FUSE UNIT - C-TYPE",
     "11KV SOLID LINK - C-TYPE": "11KV SOLID LINK - C-TYPE",
     "11KV OHL ASL C-TYPE RESET 20A 2 SHOT": "11KV OHL ASL C-TYPE RESET 20A 2 SHOT",
@@ -881,180 +691,8 @@ equipment_keys = {
     "11KV OHL FUSE ELEMENT DJP-TYPE 40A": "11KV OHL FUSE ELEMENT DJP-TYPE 40A",
     "11KV OHL FUSE ELEMENT DJP-TYPE 50A": "11KV OHL FUSE ELEMENT DJP-TYPE 50A",
     "0.5 kVa Tx for Noja": "0.5 kVa Tx for Noja",
-    "Military Cable for Noja": "Military Cable for Noja",
-    "Antenna for Soule or Noja": "Antenna for Soule or Noja",
-    "Bracket for antenna": "Bracket for antenna",
-    "Coax cable (5m)": "Coax cable (5m)",
-    "Antenna for Soule or Noja": "Antenna for Soule or Noja",
-    "Bracket for antenna": "Bracket for antenna",
-    "Coax cable (5m)": "Coax cable (5m)",
 }
 
-insulator_keys = {
-    "11kV Pin Insulator; Polymeric": "11kV Pin Insulator; Polymeric",
-    "11kV Pin Insulator; Polymeric; High Creepage": "11kV Pin Insulator; Polymeric; High Creepage",
-    "33kV Pin Insulator; Porcelain": "33kV Pin Insulator; Porcelain",
-    "33kV Post Insulator; Polymeric; Clamp Top Plate": "33kV Post Insulator; Polymeric; Clamp Top Plate",
-    "36kV Composite Post Groove Top": "36kV Composite Post Groove Top",
-    "11kV Tension Insulator; Polymeric (70kN)": "11kV Tension Insulator; Polymeric (70kN)",
-    "33kV Tension Insulator; Polymeric (70kN)": "33kV Tension Insulator; Polymeric (70kN)",
-    "36kV Composite Tension Ball/Socket Fitting (125 kN)": "36kV Composite Tension Ball/Socket Fitting (125 kN)",
-    "LV / 11kV Stay Insulator": "LV / 11kV Stay Insulator",
-    "33kV Stay Insulator": "33kV Stay Insulator",
-    "LV Insulator Bobbin Type": "LV Insulator Bobbin Type",
-    "LV Insulator Coachscrew Type": "LV Insulator Coachscrew Type"
-}
-
-
-lv_joint_kit_keys = {
-    "LVKIT/001": "LVKIT/001 Straight Jt Kit 35mm 1ph CNE/SNE Plastic",
-    "LVKIT/002": "LVKIT/002 Straight Jt Kit 35mm 1ph CNE/SNE Pilc",
-    "LVKIT/003": "LVKIT/003 Straight Jt Kit 35mm 3ph CNE/SNE Plastic",
-    "LVKIT/004": "LVKIT/004 Staight Jt 3ph 35mm XLPE to 4-35 PILC",
-    "LVKIT/005": "LVKIT/005 LV Service Cable Stop End",
-    "LVKIT/006": "LVKIT/006 LV Service off a service 4-35mm 1/3 phase CNE/SNE",
-    "LVKIT/007": "LVKIT/007 LV Service off a service 4-35mm PILC 1ph CNE/SNE",
-    "LVKIT/008": "LVKIT/008 Service Pole Term to OHL 1PH CNE",
-    "LVKIT/009": "LVKIT/009 Service Pole Term to OHL 1PH SNE",
-    "LVKIT/010": "LVKIT/010 Service Pole Term to OHL 3PH 35mm",
-    "LVKIT/011": "LVKIT/011 Service Pole Term to Fuses 1PH CNE",
-    "LVKIT/012": "LVKIT/012 Service Pole Term to Fuses 1PH SNE",
-    "LVKIT/013": "LVKIT/013 Service Pole Term to Fuses 3PH 35mm",
-    "LVKIT/014": "LVKIT/014 Service Breech Joint 70-185mm 3c W/F - CNE/SNE",
-    "LVKIT/015": "LVKIT/015 Service Breech Joint 240-300mm 3c W/F - CNE/SNE",
-    "LVKIT/016": "LVKIT/016 Service Breech Joint 50-95mm PILC - CNE/SNE",
-    "LVKIT/017": "LVKIT/017 Service Breech Joint 95-185mm PILC - CNE/SNE",
-    "LVKIT/018": "LVKIT/018 Service Breech Joint 185-300mm PILC - CNE/SNE",
-    "LVKIT/019": "LVKIT/019 Straight Joint up to 95mm 3c W/F / PILC",
-    "LVKIT/020": "LVKIT/020 Straight Joint 185mm 3c W/F / PILC / CONSAC",
-    "LVKIT/021": "LVKIT/021 Straight Joint 300mm 3c W/F / PILC / CONSAC",
-    "LVKIT/022": "LVKIT/022 Mains Breech Joint 70-95mm 3c W/F",
-    "LVKIT/023": "LVKIT/023 Mains Breech Joint 185mm 3c W/F",
-    "LVKIT/024": "LVKIT/024 Mains Breech Joint 240/300mm 3c W/F",
-    "LVKIT/025": "LVKIT/025 Mains Breech Joint 70-95mm W/F / 50-95mm PILC",
-    "LVKIT/026": "LVKIT/026 Mains Breech Joint 185mm W/F / 95-185mm PILC",
-    "LVKIT/027": "LVKIT/027 Mains Breech Joint 240/300mm W/F / 185-300mm PILC",
-    "LVKIT/028": "LVKIT/028 Loop / V Joint 50-95mm W/F / PILC",
-    "LVKIT/029": "LVKIT/029 Loop / V Joint >95-300mm W/F / PILC",
-    "LVKIT/030": "LVKIT/030 Y / 3 Loose end Joint 50-185mm W/F / PILC / Districable",
-    "LVKIT/031": "LVKIT/031 Y / 3 Loose end Joint 185-300mm W/F / PILC / Districable",
-    "LVKIT/032": "LVKIT/032 Stop End 70-95mm W/F / CONSAC",
-    "LVKIT/033": "LVKIT/033 Stop End 185-300mm W/F / CONSAC",
-    "LVKIT/034": "LVKIT/034 Stop End 50-95mm PILC",
-    "LVKIT/035": "LVKIT/035 Stop End 95-300mm PILC",
-    "LVKIT/037": "LVKIT/037 Pole Term to OHL 70-95mm W/F",
-    "LVKIT/038": "LVKIT/038 Pole Term to OHL 185mm W/F",
-    "LVKIT/039": "LVKIT/039 Pole Term to Fuses 70-95mm W/F",
-    "LVKIT/040": "LVKIT/040 Pole Term to Fuses 185mm W/F"
-}
-
-
-lv_joint_module_keys = {
-    "LVMOD/001": "LVMOD/001 Armour bond module for PILC Service cable Stop Ends",
-    "LVMOD/002": "LVMOD/002 Branch connector module for service cables",
-    "LVMOD/003": "LVMOD/003 Phase connector remake module for service cables",
-    "LVMOD/004": "LVMOD/004 XL Brass tunnel connector module for old PILC concentric cables",
-    "LVMOD/005": "LVMOD/005 Insulated insulating piercing mains/service branch connector module (up to 185mm2)",
-    "LVMOD/006": "LVMOD/006 Insulated insulating piercing mains/service branch connector module (240-300mm2)",
-    "LVMOD/007": "LVMOD/007 Brass neutral earth connector module",
-    "LVMOD/008": "LVMOD/008 CONSAC Brass neutral earth connector module",
-    "LVMOD/009": "LVMOD/009 95mm2 straight type channel connector module",
-    "LVMOD/011": "LVMOD/011 185mm2 straight type channel connector module",
-    "LVMOD/013": "LVMOD/013 300mm2 straight type channel connector module",
-    "LVMOD/015": "LVMOD/015 95mm2 branch type channel connector module",
-    "LVMOD/017": "LVMOD/017 185mm2 branch type channel connector module",
-    "LVMOD/018": "LVMOD/018 185mm2 branch type channel connector c/w brass non-shear bolts module",
-    "LVMOD/019": "LVMOD/019 300mm2 branch type channel connector module",
-    "LVMOD/021": "LVMOD/021 95mm2 1/2 length branch type connector module",
-    "LVMOD/022": "LVMOD/022 300mm2 1/2 length branch type connector module",
-    "LVMOD/023": "LVMOD/023 95mm2 Service Bridge Piece module",
-    "LVMOD/024": "LVMOD/024 185mm2 Service Bridge Piece module",
-    "LVMOD/025": "LVMOD/025 300mm2 Service Bridge Piece module",
-    "LVMOD/026": "LVMOD/026 upto 35mm2 PILC service cable Earth Bond Kit module",
-    "LVMOD/027": "LVMOD/027 50-95mm2 PILC Mains cable Earth Bond Kit module",
-    "LVMOD/028": "LVMOD/028 >95-185mm2 PILC Mains cable Earth Bond Kit module",
-    "LVMOD/029": "LVMOD/029 >185-300mm2 PILC Mains cable Earth Bond Kit module",
-    "LVMOD/030": "LVMOD/030 Torque Limiting shear-off device module",
-    "LVMOD/031": "LVMOD/031 95mm2 Aluminium mechanical shear-off lug module",
-    "LVMOD/032": "LVMOD/032 185mm2 Aluminium mechanical shear-off lug module",
-    "LVMOD/033": "LVMOD/033 300mm2 Aluminium mechanical shear-off lug module",
-    "LVMOD/034": "LVMOD/034 480-740mm2 range taking Aluminium mechanical shear-off lug module",
-    "LVMOD/035": "LVMOD/035 95mm2 Aluminium mechanical shear-off Busbar connector module",
-    "LVMOD/036": "LVMOD/036 185mm2 Aluminium mechanical shear-off Busbar connector module",
-    "LVMOD/037": "LVMOD/037 300mm2 Aluminium mechanical shear-off Busbar connector module",
-    "LVMOD/038": "LVMOD/038 70-95mm2 pole termination module kit for 4c overhead lines and fuses",
-    "LVMOD/039": "LVMOD/039 185mm pole termination module kit for 4c overhead lines and fuses",
-    "LVMOD/040": "LVMOD/040 35-70mm2 Brass shear off lug module",
-    "LVMOD/041": "LVMOD/041 60-120mm2 Brass shear off lug module"
-}
-
-hv_joint_termination_keys = {
-    "11kv XLPE 3c Straight joint": "11kV XLPE 3c Straight Joint",
-    "11kV 95mm XLPE trif joint": "11kV 95mm XLPE Trifurcating Joint",
-    "11kV 185 - 300mm XLPE Trif joint": "11kV 185-300mm XLPE Trifurcating Joint",
-    "11kV up to 70mm PILC/PICAS to XLPE Joint": "11kV PILC/PICAS to XLPE Joint (up to 70mm)",
-    "11kV 95-185 PILC/PICAS to XLPE Joint": "11kV PILC/PICAS to XLPE Joint (95-185mm)",
-    "11kV 185-300 PILC/PICAS to XLPE Joint": "11kV PILC/PICAS to XLPE Joint (185-300mm)",
-    "11kV 95-185 XLPE to up to 70mm PILC/PICAS Transition Trif Joint": "11kV XLPE to PILC/PICAS Transition Trif Joint (95-185mm to 70mm)",
-    "11kV 95-185 XLPE to 95-185 PILC/PICAS Transition Trif Joint": "11kV XLPE to PILC/PICAS Transition Trif Joint (95-185mm)",
-    "11kV 185-300 XLPE to 185-300 PILC/PICAS Transition Trif Joint": "11kV XLPE to PILC/PICAS Transition Trif Joint (185-300mm)",
-    "11kV Earthing kit for CORAL cables": "11kV Earthing Kit for CORAL Cables",
-    "11kV Earthing kit for 50-300mm PILC cables": "11kV Earthing Kit for PILC Cables (50-300mm)",
-    "11kV Earthing kit for up to 50mm PILC cables": "11kV Earthing Kit for PILC Cables (up to 50mm)",
-    "11kV Build up kit for PILC / CORAL cables": "11kV Build Up Kit for PILC/CORAL Cables",
-    "11kV Build up kit for XLPE cables": "11kV Build Up Kit for XLPE Cables",
-    "11kV 95/185mm module for PAPER to PAPER joint": "11kV Paper to Paper Joint Module (95/185mm)",
-    "11kV 300mm module for PAPER to PAPER joint": "11kV Paper to Paper Joint Module (300mm)",
-    "11kV pole Term 1c 95mm": "11kV Pole Termination 1c 95mm",
-    "11kV pole Term 1c 185/300mm": "11kV Pole Termination 1c 185/300mm",
-    "11kV pole Term 3c 95mm": "11kV Pole Termination 3c 95mm",
-    "11kV pole Term 3c 185/300mm": "11kV Pole Termination 3c 185/300mm",
-    "OUTDR TERMN POLE STEELWORK 11 KV": "11kV Outdoor Pole Termination Steelwork",
-    "11kV 95mm cable clamp for crucifix": "11kV Cable Clamp for Crucifix (95mm)",
-    "11kV 185mm cable clamp for crucifix": "11kV Cable Clamp for Crucifix (185mm)",
-    "11kV Surge Arrestor (Each)": "11kV Surge Arrestor",
-    "33kv Joint Transition Trif (H-Type)": "33kV Joint Transition Trifurcating (H-Type)",
-    "33kv Joint Trif (HSL-Type)": "33kV Joint Trifurcating (HSL-Type)",
-    "33kv Joint 0.1 sq inch connectors (3 phases)": "33kV Joint Connectors 0.1 sq inch",
-    "33kv Joint 0.4/0.5 sq inch connector (per phase)": "33kV Joint Connector 0.4/0.5 sq inch",
-    "33kv Joint Connectors for Trif 150/300 Pilc": "33kV Joint Connectors for Trifurcating 150/300 PILC",
-    "33kv Joint Straight up to 240mm (per phase)": "33kV Straight Joint (up to 240mm)",
-    "33kv Joint Straight over 240mm needs connector (per phase)": "33kV Straight Joint (over 240mm)",
-    "33kv Joint 400mm connector (each)": "33kV Joint Connector 400mm",
-    "33kv Joint Transition 150/240mm to 0.3 PILC (per phase)": "33kV Joint Transition 150/240mm to 0.3 PILC",
-    "11/33kv Pot End module up to 300mm (3 phases)": "11/33kV Pot End Module (up to 300mm)",
-    "33kV Pole Term 1c 150-240mm (3 phase set)": "33kV Pole Termination 1c 150-240mm",
-    "33kV Pole Term 1c 400-630mm (3 phase set)": "33kV Pole Termination 1c 400-630mm",
-    "33kV Cable cleats for pole terms": "33kV Cable Cleats for Pole Terminations",
-    "33kV Surge Arrestor 36kV (Each)": "33kV Surge Arrestor 36kV"
-}
-
-cable_accessory_keys = {
-    "End cap up to 17mm diameter (25(1))": "End cap up to 17mm diameter (25(1))",
-    "End cap 17-30mm dia(35(3))": "End cap 17-30mm dia(35(3))",
-    "End Cap 30-45mm dia (95 LV or HV)": "End Cap 30-45mm dia (95 LV or HV)",
-    "End Cap 45-95mm dia (185-300 LV or HV)": "End Cap 45-95mm dia (185-300 LV or HV)",
-    "Ducting 32mm (OD 38mm) per metre (100m coil)": "Ducting 32mm (OD 38mm) per metre (100m coil)",
-    "Ducting 50mm (OD 58mm) per metre (50m coil)": "Ducting 50mm (OD 58mm) per metre (50m coil)",
-    "Ducting 100mm (3m Length) (90 in pallet)": "Ducting 100mm (3m Length) (90 in pallet)",
-    "Ducting bend (100mm / 11.25 degree)": "Ducting bend (100mm / 11.25 degree)",
-    "Ducting bend (100mm / 22.5 degree)": "Ducting bend (100mm / 22.5 degree)",
-    "Ducting bend (100mm / 45 degree)": "Ducting bend (100mm / 45 degree)",
-    "Ducting 150mm (3m Length) (39 in pallet)": "Ducting 150mm (3m Length) (39 in pallet)",
-    "Ducting bend (150mm / 11.25 degree)": "Ducting bend (150mm / 11.25 degree)",
-    "Ducting bend (150mm / 22.5 degree)": "Ducting bend (150mm / 22.5 degree)",
-    "Ducting bend (150mm / 45 degree)": "Ducting bend (150mm / 45 degree)",
-    "Resin 2 litre JEM Permanent": "Resin 2 litre JEM Permanent",
-    "Resin 6 litre JEM Permanent": "Resin 6 litre JEM Permanent"
-}
-
-foundation_steelwork_keys = {
-    "H' Pole Foundation Brace Steelwork for P6.010mm Centres ( Ref. SP4017651 )": "H' Pole Foundation Brace Steelwork for P6.010mm Centres ( Ref. SP4017651 )",
-    "'H' Pole Foundation Brace Steelwork for 2500mm Centres ( Ref. SP4017652 )": "'H' Pole Foundation Brace Steelwork for 2500mm Centres ( Ref. SP4017652 )",
-    "Stay / Foundation Block Type 1; 850mm as SP4019020": "Stay / Foundation Block Type 1; 850mm as SP4019020",
-    "Stay / Foundation Block Type 2; 1300mm as SP4019020": "Stay / Foundation Block Type 2; 1300mm as SP4019020",
-    "Foundation Block Type 3; 1500mm as SP4019020": "Foundation Block Type 3; 1500mm as SP4019020"
-}
 
 summary_items = [
     "Erect Single HV/EHV Pole, up to and including 12 metre pole.",
@@ -1081,19 +719,12 @@ summary_items = [
 ]
 
 categories = [
-    ("Poles 🪵", pole_keys, "Quantity"),
     ("Poles _erected 🪵", pole_erected_keys, "Quantity"),
     ("Poles _replaced 🪵", poles_replaced_keys, "Quantity"),
     ("Transformers ⚡🏭", transformer_keys, "Quantity"),
     ("Conductors", conductor_keys, "Length (Km)"),
     ("Conductors_2", conductor_2_keys, "Length (Km)"),
     ("Equipment", equipment_keys, "Quantity"),
-    ("Insulators", insulator_keys, "Quantity"),
-    ("LV Joints (Kits)", lv_joint_kit_keys, "Quantity"),
-    ("LV Joint Modules", lv_joint_module_keys, "Quantity"),
-    ("HV Joints / Terminations ⚡", hv_joint_termination_keys, "Quantity"),
-    ("Cable Accessories 🔌", cable_accessory_keys, "Quantity"),
-    ("Foundation & Steelwork 🏗️", foundation_steelwork_keys, "Quantity")
 ]
 
 column_rename_map = {
@@ -1463,7 +1094,7 @@ if filtered_df is not None and not filtered_df.empty:
             # Aggregate sum by item
             summary_df = (
                 export_df[export_df["item_norm"].isin(summary_items_norm)]
-                .groupby("item_norm", as_index=False)["Quantity_used"]
+                .groupby(["item_norm", "done_display"], as_index=False)["Quantity_used"]
                 .sum()
             )
 
@@ -1480,9 +1111,9 @@ if filtered_df is not None and not filtered_df.empty:
             if not special_df.empty:
                 # Group by unique comment and sum quantities
                 special_summary = (
-                    special_df.groupby(["item", "comment"], as_index=False)["Quantity_used"]
+                    special_df.groupby(["item", "Manufacturer", "done_display"], as_index=False)["Quantity_used"]
                     .sum()
-                    .rename(columns={"item": "Description", "Quantity_used": "Total Quantity", "comment": "Comment"})
+                    .rename(columns={"item": "Description", "Quantity_used": "Total Quantity", "comment": "Comment","done_display": "Done Date"})
                     )
 
                 # --- Normalise comment safely ---
@@ -1918,19 +1549,12 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
     convert_to_miles = st.checkbox("Convert Equipment/Conductor Length to Miles")
 
     categories = [
-        ("Poles 🪵", pole_keys, "Quantity"),
         ("Poles _erected 🪵", pole_erected_keys, "Quantity"),
         ("Poles _replaced 🪵", poles_replaced_keys, "Quantity"),
         ("Transformers ⚡🏭", transformer_keys, "Quantity"),
         ("Conductors", conductor_keys, "Length (Km)"),
         ("Conductors_2", conductor_2_keys, "Length (Km)"),
         ("Equipment", equipment_keys, "Quantity"),
-        ("Insulators", insulator_keys, "Quantity"),
-        ("LV Joints (Kits)", lv_joint_kit_keys, "Quantity"),
-        ("LV Joint Modules", lv_joint_module_keys, "Quantity"),
-        ("HV Joints / Terminations ⚡", hv_joint_termination_keys, "Quantity"),
-        ("Cable Accessories 🔌", cable_accessory_keys, "Quantity"),
-        ("Foundation & Steelwork 🏗️", foundation_steelwork_keys, "Quantity")
     ]
 
     def sanitize_sheet_name(name: str) -> str:
@@ -1971,7 +1595,11 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
 
         # Divide Conductors_2 by 1000
         if cat_name == "Conductors_2":
-            bar_data['Total'] = bar_data['Total'] / 1000
+            bar_data['Total'] = bar_data['Total']
+
+        # Divide Conductors_2 by 1000
+        if cat_name == "Conductors":
+            bar_data['Total'] = bar_data['Total']
 
         # Convert conductor units if needed
         y_axis_label = y_label
