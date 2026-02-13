@@ -381,7 +381,7 @@ def generate_excel_styled_multilevel(filtered_df, poles_df=None):
     ws.title = "Daily Revenue"
 
     # ---- Sheet 1: Daily Revenue ----
-    if {'shire', 'project', 'segmentcode', 'projectmanager', 'datetouse_dt', 'total'}.issubset(filtered_df.columns):
+    if {'shire', 'project', 'segmentcode', 'projectmanager', 'datetouse_dt','done', 'total'}.issubset(filtered_df.columns):
         daily_df = (
             filtered_df
             .groupby(['datetouse_dt','shire','project','segmentcode','projectmanager'], as_index=False)
@@ -1109,7 +1109,7 @@ column_rename_map = {
 }
 
 export_columns = [
-    'Output','comment', 'item', 'Quantity_original','Quantity_used', 'material_code','type', 'pole', 'Date',
+    'Output','comment', 'item', 'Quantity_original','Quantity_used', 'material_code','type', 'pole', 'Date','done',
     'District', 'project', 'Project Manager', 'Circuit', 'Segment',
     'team lider', 'PID', 'sourcefile'
 ]
@@ -1615,7 +1615,7 @@ else:
 # -------------------------------
 # Jobs per Team per Day
 # -------------------------------
-if {'datetouse_dt', 'team_name', 'total'}.issubset(filtered_df.columns):
+if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
     team_df = (
         filtered_df
         .dropna(subset=['datetouse_dt', 'team_name'])
@@ -2055,7 +2055,7 @@ if {'datetouse_dt', 'team_name', 'total'}.issubset(filtered_df.columns):
 
 
             # Your original approach but working:
-            extra_cols = ['poling team','team_name','shire','project','projectmanager','segmentcode','segmentdesc', 'material_code' ,'pid_ohl_nr', 'sourcefile' ]
+            extra_cols = ['done','poling team','team_name','shire','project','projectmanager','segmentcode','segmentdesc', 'material_code' ,'pid_ohl_nr', 'sourcefile' ]
             
             # Rename first
             selected_rows = selected_rows.rename(columns={
@@ -2082,7 +2082,7 @@ if {'datetouse_dt', 'team_name', 'total'}.issubset(filtered_df.columns):
             # 🔥 RENAME FOR DISPLAY
             selected_rows = selected_rows.rename(columns=column_rename_map)
 
-            display_cols = ['Output','Quantity','material_code','pole','Date','District','project','Project Manager','Circuit','Segment','team lider','PID', 'sourcefile']
+            display_cols = ['Output','Quantity','material_code','pole','Date','done','District','project','Project Manager','Circuit','Segment','team lider','PID', 'sourcefile']
             display_cols = [c for c in display_cols if c in selected_rows.columns]
         
 
@@ -2111,7 +2111,7 @@ if {'datetouse_dt', 'team_name', 'total'}.issubset(filtered_df.columns):
                     # 🔥 Rename columns BEFORE selecting
                     df_bar = df_bar.rename(columns=column_rename_map)
 
-                    cols_to_include = ['Output','Quantity','material_code','pole','Date','District','project','Project Manager','Circuit','Segment','team lider','PID', 'sourcefile']
+                    cols_to_include = ['Output','Quantity','material_code','pole','Date','done','District','project','Project Manager','Circuit','Segment','team lider','PID', 'sourcefile']
                     cols_to_include = [c for c in cols_to_include if c in df_bar.columns]
                     df_bar = df_bar[cols_to_include]
 
