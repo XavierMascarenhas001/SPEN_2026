@@ -1150,13 +1150,6 @@ if filtered_df is not None and not filtered_df.empty:
                 # CONDUCTORS
                 conductor_hv = df_proj[df_proj["item_norm"].isin(conductor_hv_norm)]["Quantity_used"].sum()
                 conductor_lv = df_proj[df_proj["item_norm"].isin(conductor_lv_norm)]["Quantity_used"].sum()
-
-                # VALUE (if exists)
-                if "total" in df_proj.columns:
-                    total_value = pd.to_numeric(df_proj["value"], errors="coerce").fillna(0).sum()
-                else:
-                    total_value = 0
-
                 # --- NEW TASK COLUMNS ---
                 noja_keys = [normalize_item("Noja"), normalize_item("0.5 kVa Tx for Noja")]
                 soule_keys = [normalize_item("11kV PMSW (Soule)")]
@@ -1174,6 +1167,12 @@ if filtered_df is not None and not filtered_df.empty:
                 soule_sum = df_proj[df_proj["item_norm"].isin(soule_keys)]["Quantity_used"].sum()
                 absw_sum = df_proj[df_proj["item_norm"].isin(absw_keys)]["Quantity_used"].sum()
                 fuse_11kv_sum = df_proj[df_proj["item_norm"].isin(fuse_11kv_keys)]["Quantity_used"].sum()
+
+                # VALUE (if exists)
+                if "total" in df_proj.columns:
+                    total_value = pd.to_numeric(df_proj["value"], errors="coerce").fillna(0).sum()
+                else:
+                    total_value = 0
 
                 summary_rows.append({
                     "Project": project,
