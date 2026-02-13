@@ -1257,7 +1257,7 @@ if filtered_df is not None and not filtered_df.empty:
                 IMG_WIDTH_SMALL = 120
                 IMG_WIDTH_LARGE = IMG_WIDTH_SMALL * 3
 
-               img1_b.width = IMG_WIDTH_SMALL
+                img1_b.width = IMG_WIDTH_SMALL
                 img1_b.height = IMG_HEIGHT
                 img1_b.anchor = "B1"
 
