@@ -1183,7 +1183,11 @@ if filtered_df is not None and not filtered_df.empty:
                     "PTE Installed 3ph": pte_3ph,
                     "Conductor HV Installed (Km)": conductor_hv,
                     "Conductor LV Installed (Km)": conductor_lv,
-                    "total": total_value
+                    "Noja": noja_sum,
+                    "Soule": soule_sum,
+                    "ABSW": absw_sum,
+                    "11 kV fuse": fuse_11kv_sum,
+                    "Value": total_value
                 })
 
             # Create DataFrame
