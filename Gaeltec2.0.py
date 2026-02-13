@@ -1206,6 +1206,47 @@ if filtered_df is not None and not filtered_df.empty:
             final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1)
             ws_summary = writer.book["Summary"]
 
+
+        # ---- Breakdown sheets per summary column ----
+            breakdown_columns = {
+                "Erect Poles": erect_norm,
+                "Recover Poles": recover_norm,
+                "Poles Refurb": None,  # Special logic
+                "PTE Installed 1ph": tx_1ph_keys,
+                "PTE Installed 3ph": tx_3ph_keys,
+                "Conductor HV Installed (Km)": conductor_hv_norm,
+                "Conductor LV Installed (Km)": conductor_lv_norm,
+                "Noja": noja_keys,
+                "Soule": soule_keys,
+                "ABSW": absw_keys,
+                "11 kV fuse": fuse_11kv_keys,
+            }
+
+            for col_name, keys in breakdown_columns.items():
+                sheet_name = col_name[:31]  # Excel sheet name max 31 chars
+
+                if col_name == "Poles Refurb":
+                    # Poles NOT in Erect or Recover
+                    all_poles_set = set(export_df["pole"].dropna().astype(str).str.strip())
+                    erect_poles_set = set(export_df[export_df["item_norm"].isin(erect_norm)]["pole"].dropna().astype(str).str.strip())
+                    recover_poles_set = set(export_df[export_df["item_norm"].isin(recover_norm)]["pole"].dropna().astype(str).str.strip())
+                    refurb_poles_set = all_poles_set - erect_poles_set - recover_poles_set
+                    df_breakdown = export_df[export_df["pole"].isin(refurb_poles_set)]
+                else:
+                    df_breakdown = export_df[export_df["item_norm"].isin(keys)]
+
+                # Columns to include
+                cols_to_include = [
+                    "item","comment","Quantity_used","material_code","pole","datetouse_dt","done_display",
+                    "District","Project Manager","Circuit","Segment"
+                ]
+                cols_to_include = [c for c in cols_to_include if c in df_breakdown.columns]
+                df_breakdown = df_breakdown[cols_to_include]
+
+                # Write sheet
+                df_breakdown.to_excel(writer, sheet_name=sheet_name, index=False, startrow=1)
+                ws_break = writer.book[sheet_name]
+
         # ---- Formatting styles ----
         header_font = Font(bold=True, size=16)
         header_fill = PatternFill(start_color="00CCFF", end_color="00CCFF", fill_type="solid")
