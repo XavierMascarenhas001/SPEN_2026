@@ -1142,9 +1142,6 @@ if filtered_df is not None and not filtered_df.empty:
                 # Poles Refurb = poles NOT in Erect nor Recover
                 refurb_poles_set = all_poles_set - erect_poles_set - recover_poles_set
                 poles_refurb = len(refurb_poles_set)
-            
-                poles_refurb = total_pole_activity - erect_poles - recover_poles
-                poles_refurb = max(poles_refurb, 0)
 
                 # TRANSFORMERS
                 pte_1ph = df_proj[df_proj["item_norm"].isin(tx_1ph_keys)]["Quantity_used"].sum()
