@@ -1402,97 +1402,97 @@ else:
 
 
     
-    # Display Project and completion
-    col_top_left, col_top_right = st.columns([1, 1])
-    # Project Completion
-    with col_top_left:
-        st.markdown("<h3 style='text-align:center; color:white;'>Projects Distribution</h3>", unsafe_allow_html=True)
-        # --- Top-right Pie Chart: Projects Distribution ---
-        try:
-            if 'filtered_df' in locals() and not filtered_df.empty and 'project' in filtered_df.columns:
+# Display Project and completion
+col_top_left, col_top_right = st.columns([1, 1])
+# Project Completion
+with col_top_left:
+    st.markdown("<h3 style='text-align:center; color:white;'>Projects Distribution</h3>", unsafe_allow_html=True)
+    # --- Top-right Pie Chart: Projects Distribution ---
+    try:
+        if 'filtered_df' in locals() and not filtered_df.empty and 'project' in filtered_df.columns:
                 
-                # Count projects and get top projects
-                project_counts = filtered_df['project'].value_counts().reset_index()
-                project_counts.columns = ['Project', 'total']
+            # Count projects and get top projects
+            project_counts = filtered_df['project'].value_counts().reset_index()
+            project_counts.columns = ['Project', 'total']
                 
-                # If too many projects, group smaller ones into "Other"
-                if len(project_counts) > 8:
-                    top_projects = project_counts.head(7)
-                    other_count = project_counts['total'].iloc[7:].sum()
-                    other_row = pd.DataFrame({'Project': ['Other'], 'total': [other_count]})
-                    project_data = pd.concat([top_projects, other_row], ignore_index=True)
-                else:
-                    project_data = project_counts
-                
-                # Create pie chart
-                fig_projects = px.pie(
-                    project_data,
-                    names='Project',
-                    values='total',
-                    title="",
-                    hole=0.4
-                )
-                fig_projects.update_traces(
-                    textinfo='percent+label',
-                    textfont_size=14,
-                    marker=dict(line=dict(color='#000000', width=1))
-                )
-                fig_projects.update_layout(
-                    title_text="",
-                    title_font_size=16,
-                    font=dict(color='white'),
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    showlegend=False,
-                    annotations=[dict(text=f'Total<br>{len(filtered_df)}', x=0.5, y=0.5, font_size=16, showarrow=False)]
-                )
-                
-                st.plotly_chart(fig_projects, use_container_width=True)
-                
+            # If too many projects, group smaller ones into "Other"
+            if len(project_counts) > 8:
+                top_projects = project_counts.head(7)
+                other_count = project_counts['total'].iloc[7:].sum()
+                other_row = pd.DataFrame({'Project': ['Other'], 'total': [other_count]})
+                project_data = pd.concat([top_projects, other_row], ignore_index=True)
             else:
-                st.info("No project data available for the selected filters.")
+                project_data = project_counts
                 
-        except Exception as e:
-            st.warning(f"Could not generate projects pie chart: {e}")
+            # Create pie chart
+            fig_projects = px.pie(
+                project_data,
+                names='Project',
+                values='total',
+                title="",
+                hole=0.4
+            )
+            fig_projects.update_traces(
+                textinfo='percent+label',
+                textfont_size=14,
+                marker=dict(line=dict(color='#000000', width=1))
+            )
+            fig_projects.update_layout(
+                title_text="",
+                title_font_size=16,
+                font=dict(color='white'),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)',
+                showlegend=False,
+                annotations=[dict(text=f'Total<br>{len(filtered_df)}', x=0.5, y=0.5, font_size=16, showarrow=False)]
+            )
+                
+            st.plotly_chart(fig_projects, use_container_width=True)
+                
+        else:
+            st.info("No project data available for the selected filters.")
+                
+    except Exception as e:
+        st.warning(f"Could not generate projects pie chart: {e}")
 
-    # Works total
-    with col_top_right:
-        # Left side: Projects & Segments Overview and Works Complete pie chart
-        col_left_top, col_left_bottom = st.columns([1, 1])
+# Works total
+with col_top_right:
+    # Left side: Projects & Segments Overview and Works Complete pie chart
+    col_left_top, col_left_bottom = st.columns([1, 1])
         
-        with col_left_top:
-            st.markdown("<h3 style='color:white;'>Projects & Circuits Overview</h3>", unsafe_allow_html=True)
-            required_cols = ['project', 'segmentcode']
-            existing_cols = [c for c in required_cols if c in filtered_df.columns]
+    with col_left_top:
+        st.markdown("<h3 style='color:white;'>Projects & Circuits Overview</h3>", unsafe_allow_html=True)
+        required_cols = ['project', 'segmentcode']
+        existing_cols = [c for c in required_cols if c in filtered_df.columns]
 
-            if 'project' in existing_cols:
-                projects = filtered_df['project'].dropna().unique()
-                if len(projects) == 0:
-                    st.info("No projects found for the selected filters.")
-                else:
-                    for proj in sorted(projects):
-                        cols_to_use = [c for c in ['segmentcode'] if c in filtered_df.columns]
-                        if not cols_to_use:
-                            segments = pd.DataFrame()
-                        else:
-                            proj_df = filtered_df[filtered_df['project'] == proj][cols_to_use]
-                            segments = proj_df.dropna().drop_duplicates()
-                    
-                        # Use expander to make segment list scrollable
-                        with st.expander(f"Project: {proj} ({len(segments)} circuits)"):
-                            if not segments.empty:
-                                display_text = segments.astype(str).agg(" | ".join, axis=1)
-                                # Scrollable container for segments
-                                st.markdown(
-                                    "<div style='max-height:150px; overflow-y:auto; padding:5px; border:1px solid #444;'>"
-                                    + "<br>".join(segments['segmentcode'].astype(str))
-                                    + "</div>",
-                                    unsafe_allow_html=True
-                                )
-                            else:
-                                st.write("No circuit codes for this project.")
+        if 'project' in existing_cols:
+            projects = filtered_df['project'].dropna().unique()
+            if len(projects) == 0:
+                st.info("No projects found for the selected filters.")
             else:
-                st.info("Project or Circuit not found in the data.")
+                for proj in sorted(projects):
+                    cols_to_use = [c for c in ['segmentcode'] if c in filtered_df.columns]
+                    if not cols_to_use:
+                        segments = pd.DataFrame()
+                    else:
+                        proj_df = filtered_df[filtered_df['project'] == proj][cols_to_use]
+                        segments = proj_df.dropna().drop_duplicates()
+                    
+                    # Use expander to make segment list scrollable
+                    with st.expander(f"Project: {proj} ({len(segments)} circuits)"):
+                        if not segments.empty:
+                            display_text = segments.astype(str).agg(" | ".join, axis=1)
+                            # Scrollable container for segments
+                            st.markdown(
+                                "<div style='max-height:150px; overflow-y:auto; padding:5px; border:1px solid #444;'>"
+                                + "<br>".join(segments['segmentcode'].astype(str))
+                                + "</div>",
+                                unsafe_allow_html=True
+                            )
+                        else:
+                            st.write("No circuit codes for this project.")
+        else:
+            st.info("Project or Circuit not found in the data.")
 
     # -----------------------------
     # Streamlit download button
