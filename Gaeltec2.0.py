@@ -381,15 +381,17 @@ def generate_excel_styled_multilevel(filtered_df, poles_df=None):
     ws.title = "Daily Revenue"
 
     # ---- Sheet 1: Daily Revenue ----
-    if {'shire', 'project', 'segmentcode', 'projectmanager', 'datetouse_dt','done', 'total'}.issubset(filtered_df.columns):
+    if {'shire', 'project','location_map','segmentdesc', 'segmentcode', 'projectmanager', 'datetouse_dt','done', 'total'}.issubset(filtered_df.columns):
         daily_df = (
             filtered_df
-            .groupby(['datetouse_dt','shire','project','segmentcode','projectmanager'], as_index=False)
+            .groupby(['datetouse_dt','shire','project','location_map','segmentdesc','segmentcode','projectmanager'], as_index=False)
             .agg({'total':'sum'})
         )
         daily_df.rename(columns={
             'datetouse_dt':'Date',
             'total':'Revenue (£)',
+            'location_map':'location',
+            'segmentdesc':'Detail',
             'segmentcode':'Segment',
             'projectmanager':'Project Manager'
         }, inplace=True)
@@ -415,7 +417,7 @@ def generate_excel_styled_multilevel(filtered_df, poles_df=None):
         poles_summary.rename(columns={'pole':'Poles', 'segmentcode':'Segment'}, inplace=True)
 
         # Write multi-level headers (Row 2-4)
-        headers = ['Shire','Project','Segment','Poles']
+        headers = ['Shire','Project','Segment','location_map','Poles']
         for idx, h in enumerate(headers, start=1):
             ws_summary.cell(row=2, column=idx, value=h)  # Shire header
             ws_summary.cell(row=3, column=idx, value=h if h != 'Poles' else '')  # Project header
@@ -741,7 +743,7 @@ column_rename_map = {
 
 export_columns = [
     'Output','comment', 'item', 'Quantity_original','Quantity_used', 'material_code','type', 'pole', 'Date',
-    'District', 'project', 'Project Manager', 'Circuit', 'Segment',
+    'District', 'project', 'Project Manager','location_map', 'Circuit', 'Segment',
     'team lider', 'PID', 'sourcefile'
 ]
 
@@ -1083,7 +1085,7 @@ if filtered_df is not None and not filtered_df.empty:
         cols_to_include = [
             "item","comment", "Quantity_original", "Quantity_used", "material_code",
             "type", "pole", "datetouse_dt", "District", "project",
-            "Project Manager", "Circuit", "Segment",
+            "Project Manager","location_map", "Circuit", "Segment",
             "team lider","total", "PID", "sourcefile"
         ]
         cols_to_include = [c for c in cols_to_include if c in export_df.columns]
@@ -1252,7 +1254,7 @@ if filtered_df is not None and not filtered_df.empty:
                 # Columns to include
                 cols_to_include = [
                     "item","comment","Quantity_used","material_code","pole","datetouse_dt","done_display",
-                    "District","Project Manager","Circuit","Segment"
+                    "District", "project","Project Manager","location_map","Circuit","Segment"
                 ]
                 cols_to_include = [c for c in cols_to_include if c in df_breakdown.columns]
                 df_breakdown = df_breakdown[cols_to_include]
@@ -1536,30 +1538,38 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
         col_left_top, col_left_bottom = st.columns([1, 1])
         
         with col_left_top:
-            st.markdown("<h3 style='color:white;'>Projects & Segments Overview</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='color:white;'>Projects & Circuits Overview</h3>", unsafe_allow_html=True)
+            required_cols = ['project', 'segmentcode']
+            existing_cols = [c for c in required_cols if c in filtered_df.columns]
 
-            if 'project' in filtered_df.columns and 'segmentcode' in filtered_df.columns:
+            if 'project' in existing_cols:
                 projects = filtered_df['project'].dropna().unique()
                 if len(projects) == 0:
                     st.info("No projects found for the selected filters.")
                 else:
                     for proj in sorted(projects):
-                        segments = filtered_df[filtered_df['project'] == proj]['segmentcode'].dropna().unique()
+                        cols_to_use = [c for c in ['segmentcode'] if c in filtered_df.columns]
+                        if not cols_to_use:
+                            segments = pd.DataFrame()
+                        else:
+                            proj_df = filtered_df[filtered_df['project'] == proj][cols_to_use]
+                            segments = proj_df.dropna().drop_duplicates()
                     
                         # Use expander to make segment list scrollable
-                        with st.expander(f"Project: {proj} ({len(segments)} segments)"):
-                            if len(segments) > 0:
+                        with st.expander(f"Project: {proj} ({len(segments)} circuits)"):
+                            if not segments.empty:
+                                display_text = segments.astype(str).agg(" | ".join, axis=1)
                                 # Scrollable container for segments
                                 st.markdown(
                                     "<div style='max-height:150px; overflow-y:auto; padding:5px; border:1px solid #444;'>"
-                                    + "<br>".join(segments.astype(str))
+                                    + "<br>".join(segments['segmentcode'].astype(str))
                                     + "</div>",
                                     unsafe_allow_html=True
                                 )
                             else:
-                                st.write("No segment codes for this project.")
+                                st.write("No circuit codes for this project.")
             else:
-                st.info("Project or Segment Code columns not found in the data.")
+                st.info("Project or Circuit not found in the data.")
 
     # -----------------------------
     # Streamlit download button
@@ -1592,8 +1602,8 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
             gdf_list = [gpd.read_file(file) for file in file_list]
             combined_gdf = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True), crs=gdf_list[0].crs)
 
-            if "region" in filtered_df.columns:
-                active_regions = filtered_df["region"].dropna().unique().tolist()
+            if "location_map" in filtered_df.columns:
+                active_regions = filtered_df["location_map"].dropna().unique().tolist()
                 wards_to_select = []
                 for region in active_regions:
                     if region in mapping_region:
@@ -1650,65 +1660,6 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
                 )
             else:
                 st.info("No matching regions found for the selected filters.")
-
-
-    with col_desc:
-        st.markdown("<h3 style='color:white;'>Weather</h3>", unsafe_allow_html=True)
-        
-        # --- Scottish Weather Widget ---
-        try:
-            # Get API key from secrets
-            api_key = st.secrets.get("d4d09fcf1373f72c30b970fb20d51fd9")
-            
-            if not api_key:
-                st.info("Weather API key not configured")
-            else:
-                # Location selector
-                location = st.selectbox(
-                    "Select Location",
-                    ["Ayrshire", "Lanarkshire", "Glasgow", "Edinburgh"],
-                    index=0,
-                    key="weather_location"
-                )
-                
-                if st.button("Refresh Weather", key="refresh_weather"):
-                    st.rerun()
-                
-                # Get current weather
-                weather_data = get_scottish_weather(api_key, location)
-                
-                if weather_data:
-                    # Display weather information
-                    temp = weather_data['main']['temp']
-                    feels_like = weather_data['main']['feels_like']
-                    humidity = weather_data['main']['humidity']
-                    wind_speed = weather_data['wind']['speed']
-                    description = weather_data['weather'][0]['description'].title()
-                    icon_code = weather_data['weather'][0]['icon']
-                    
-                    # Weather icon and description
-                    col_icon, col_desc = st.columns([1, 2])
-                    with col_icon:
-                        st.image(f"http://openweathermap.org/img/wn/{icon_code}@2x.png", width=50)
-                    with col_desc:
-                        st.write(f"**{description}**")
-                    
-                    # Weather metrics
-                    st.metric("Temperature", f"{temp}°C", f"Feels like {feels_like}°C")
-                    st.metric("Humidity", f"{humidity}%")
-                    st.metric("Wind Speed", f"{wind_speed} m/s")
-                    
-                    # Construction impact assessment
-                    st.markdown("---")
-                    st.markdown("**Construction Impact:**")
-                    impact = assess_construction_impact(weather_data)
-                    st.write(impact)
-                else:
-                    st.error("Failed to fetch weather data")
-                    
-        except Exception as e:
-            st.warning(f"Could not load weather information: {e}")
-
 
 # -------------------------------
 # --- Mapping Bar Charts + Drill-down + Excel Export ---
