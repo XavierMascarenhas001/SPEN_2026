@@ -1513,76 +1513,76 @@ with col_top_right:
     # -------------------------------
     # --- Map Section ---
     # -------------------------------
-    col_map, col_desc = st.columns([2, 1])
-    with col_map:
-        st.header("🗺️ Regional Map View")
-        folder_path = r"Maps"
-        file_list = glob.glob(os.path.join(folder_path, "*.json"))
+col_map, col_desc = st.columns([2, 1])
+with col_map:
+    st.header("🗺️ Regional Map View")
+    folder_path = r"Maps"
+    file_list = glob.glob(os.path.join(folder_path, "*.json"))
 
-        if not file_list:
-            st.error(f"No JSON files found in folder: {folder_path}")
+    if not file_list:
+        st.error(f"No JSON files found in folder: {folder_path}")
+    else:
+        gdf_list = [gpd.read_file(file) for file in file_list]
+        combined_gdf = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True), crs=gdf_list[0].crs)
+
+        if "location_map" in filtered_df.columns:
+            active_regions = filtered_df["region"].dropna().unique().tolist()
+            wards_to_select = []
+            for region in active_regions:
+                if region in mapping_region:
+                     wards_to_select.extend(mapping_region[region])
+                else:
+                    wards_to_select.append(region)
+            wards_to_select = list(set(wards_to_select))
+            areas_of_interest = combined_gdf[combined_gdf["WD13NM"].isin(wards_to_select)]
         else:
-            gdf_list = [gpd.read_file(file) for file in file_list]
-            combined_gdf = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True), crs=gdf_list[0].crs)
+            areas_of_interest = pd.DataFrame()
 
-            if "location_map" in filtered_df.columns:
-                active_regions = filtered_df["region"].dropna().unique().tolist()
-                wards_to_select = []
-                for region in active_regions:
-                    if region in mapping_region:
-                        wards_to_select.extend(mapping_region[region])
-                    else:
-                        wards_to_select.append(region)
-                wards_to_select = list(set(wards_to_select))
-                areas_of_interest = combined_gdf[combined_gdf["WD13NM"].isin(wards_to_select)]
-            else:
-                areas_of_interest = pd.DataFrame()
+        if not areas_of_interest.empty:
+            areas_of_interest["geometry_simplified"] = areas_of_interest.geometry.simplify(tolerance=0.01)
+            centroid = areas_of_interest.geometry_simplified.centroid.unary_union.centroid
 
-            if not areas_of_interest.empty:
-                areas_of_interest["geometry_simplified"] = areas_of_interest.geometry.simplify(tolerance=0.01)
-                centroid = areas_of_interest.geometry_simplified.centroid.unary_union.centroid
-
-                # Red flag
-                flag_data = pd.DataFrame({"lon": [centroid.x], "lat": [centroid.y], "icon_name": ["red_flag"]})
-                icon_mapping = {
-                    "red_flag": {
-                        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Red_flag_icon.svg/128px-Red_flag_icon.png",
-                        "width": 128, "height": 128, "anchorY": 128
-                    }
+            # Red flag
+            flag_data = pd.DataFrame({"lon": [centroid.x], "lat": [centroid.y], "icon_name": ["red_flag"]})
+            icon_mapping = {
+                "red_flag": {
+                    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Red_flag_icon.svg/128px-Red_flag_icon.png",
+                    "width": 128, "height": 128, "anchorY": 128
                 }
+            }
 
-                polygon_layer = pdk.Layer(
-                    "GeoJsonLayer",
-                    areas_of_interest["geometry_simplified"].__geo_interface__,
-                    stroked=True,
-                    filled=True,
-                    get_fill_color=[160, 120, 80, 200],
-                    get_line_color=[0, 0, 0],
-                    pickable=True
+            polygon_layer = pdk.Layer(
+                "GeoJsonLayer",
+                areas_of_interest["geometry_simplified"].__geo_interface__,
+                stroked=True,
+                filled=True,
+                get_fill_color=[160, 120, 80, 200],
+                get_line_color=[0, 0, 0],
+                pickable=True
+            )
+
+            flag_layer = pdk.Layer(
+                "IconLayer",
+                data=flag_data,
+                get_icon="icon_name",
+                get_size=4,
+                size_scale=15,
+                get_position='[lon, lat]',
+                pickable=True,
+                icon_mapping=icon_mapping
+            )
+
+            view_state = pdk.ViewState(latitude=centroid.y, longitude=centroid.x, zoom=8, pitch=0)
+
+            st.pydeck_chart(
+                pdk.Deck(
+                    layers=[polygon_layer, flag_layer],
+                    initial_view_state=view_state,
+                    map_style="mapbox://styles/mapbox/outdoors-v11"
                 )
-
-                flag_layer = pdk.Layer(
-                    "IconLayer",
-                    data=flag_data,
-                    get_icon="icon_name",
-                    get_size=4,
-                    size_scale=15,
-                    get_position='[lon, lat]',
-                    pickable=True,
-                    icon_mapping=icon_mapping
-                )
-
-                view_state = pdk.ViewState(latitude=centroid.y, longitude=centroid.x, zoom=8, pitch=0)
-
-                st.pydeck_chart(
-                    pdk.Deck(
-                        layers=[polygon_layer, flag_layer],
-                        initial_view_state=view_state,
-                        map_style="mapbox://styles/mapbox/outdoors-v11"
-                    )
-                )
-            else:
-                st.info("No matching regions found for the selected filters.")
+            )
+        else:
+            st.info("No matching regions found for the selected filters.")
 
 # -------------------------------
 # --- Mapping Bar Charts + Drill-down + Excel Export ---
