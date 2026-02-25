@@ -1200,7 +1200,6 @@ if filtered_df is not None and not filtered_df.empty:
                 "CV7_recover": recover_norm,
                 "CV8": cv8_norm,  # Special logic
                 "CV7 TX": tx_norm,
-                "PTE Installed 3ph": tx_3ph_keys,
                 "CV7 HV Conductor": conductor_hv_norm,
                 "CV7 LV Conductor": conductor_lv_norm,
                 "CV7 Switchgear": switchgear_norm,
