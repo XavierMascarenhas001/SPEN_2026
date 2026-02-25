@@ -605,7 +605,7 @@ CV7_recover = {
 
 
 # --- Transformer Mappings ---
-CV7 Tx = {
+CV7_Tx = {
     "Erect pole mounted transformer up to 100kVA 1.ph.": "CV7 Tx",
     "Erect pole mounted transformer up to 200kVA 3.p.h.": "CV7 Tx",
     "Erect Voltage Regulator.": "CV7 Tx",
@@ -616,7 +616,7 @@ CV7 Tx = {
 }
 
 # --- Equipment / Conductor Mappings ---
-CV7 OHL CONDUCTOR = {
+CV7_OHL_CONDUCTOR = {
     "Install bare conductor, run out, sag, terminate, bind in and connect jumpers; <100mm²": "CV7 OHL CONDUCTOR",
     "Install bare conductor, run out, sag, terminate, bind in and connect jumpers; >=100mm² <200mm²": "CV7 OHL CONDUCTOR",
     "Install conductor, run out, sag, terminate, clamp in and form jumper loops; >=200mm²": "CV7 OHL CONDUCTOR",
@@ -626,7 +626,7 @@ CV7 OHL CONDUCTOR = {
 }
 
     # LV cables per meter
-CV7 OHL CONDUCTOR LV = {
+CV7_OHL_CONDUCTOR LV = {
     "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 2c": "CV7 OHL CONDUCTOR LV",
     "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 4c": "CV7 OHL CONDUCTOR LV",
     "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 2c + Earth": "CV7 OHL CONDUCTOR LV",
@@ -643,7 +643,7 @@ CV7 OHL CONDUCTOR LV = {
 }
 
 
-CV7 SWITCHGEAR = {
+CV7_SWITCHGEAR = {
     "Erect 11kV/33kV ABSW": "CV7 SWITCHGEAR",
     "Erect 11kV Remote Controlled Switch Disconnector ( Soule Auguste ) or Auto Reclosure unit c/w VT, Aerial, RTU & umbilical cable.": "CV7 SWITCHGEAR",
     "Erect 1.ph fuse units at single tee off pole or in line pole.": "CV7 SWITCHGEAR",
@@ -1665,10 +1665,10 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
     categories = [
         ("CV7_erect", CV7_erect, "Quantity"),
         ("CV7_recover", CV7_recover, "Quantity"),
-        ("CV7 Tx", CV7 Tx, "Quantity"),
-        ("CV7 OHL CONDUCTOR", CV7 OHL CONDUCTOR, "Length (Km)"),
-        ("CV7 OHL CONDUCTOR LV", CV7 OHL CONDUCTOR LV, "Length (Km)"),
-        ("CV7 SWITCHGEAR", CV7 SWITCHGEAR, "Quantity"),
+        ("CV7 Tx", CV7_Tx, "Quantity"),
+        ("CV7 OHL CONDUCTOR", CV7_OHL_CONDUCTOR, "Length (Km)"),
+        ("CV7 OHL CONDUCTOR LV", CV7_OHL_CONDUCTOR LV, "Length (Km)"),
+        ("CV7 SWITCHGEAR", CV7_SWITCHGEAR, "Quantity"),
         ("CV7_UG", CV7_UG, "Quantity"),
         ("CV7_CB", CV7_CB, "Quantity"),
         ("CV31", CV31, "Quantity"),
