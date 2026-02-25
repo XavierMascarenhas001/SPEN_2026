@@ -381,16 +381,16 @@ def generate_excel_styled_multilevel(filtered_df, poles_df=None):
     ws.title = "Daily Revenue"
 
     # ---- Sheet 1: Daily Revenue ----
-    if {'shire', 'project','location_map','segmentdesc', 'segmentcode', 'projectmanager', 'datetouse_dt','done', 'total'}.issubset(filtered_df.columns):
+    if {'shire', 'project','region','segmentdesc', 'segmentcode', 'projectmanager', 'datetouse_dt','done', 'total'}.issubset(filtered_df.columns):
         daily_df = (
             filtered_df
-            .groupby(['datetouse_dt','shire','project','location_map','segmentdesc','segmentcode','projectmanager'], as_index=False)
+            .groupby(['datetouse_dt','shire','project','region','segmentdesc','segmentcode','projectmanager'], as_index=False)
             .agg({'total':'sum'})
         )
         daily_df.rename(columns={
             'datetouse_dt':'Date',
             'total':'Revenue (£)',
-            'location_map':'location',
+            'region':'location',
             'segmentdesc':'Detail',
             'segmentcode':'Segment',
             'projectmanager':'Project Manager'
@@ -1400,71 +1400,7 @@ if filtered_df is not None and not filtered_df.empty:
 else:
     st.info("Project or Segment Code columns not found in the data.")
 
-# -------------------------------
-# Jobs per Team per Day
-# -------------------------------
-if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
-    team_df = (
-        filtered_df
-        .dropna(subset=['datetouse_dt', 'team_name'])
-        .groupby(['datetouse_dt', 'team_name'], as_index=False)['total']
-        .sum()
-    )
 
-    fig_team = px.line(
-        team_df,
-        x='datetouse_dt',
-        y='total',
-        color='team_name',
-        markers=True,
-        title="Jobs per Team per Day"
-    )
-    st.plotly_chart(fig_team, use_container_width=True)
-
-
-    # -------------------------------
-    # Revenue per Project (Excel Export)
-    # -------------------------------
-    if not filtered_df.empty and 'project' in filtered_df.columns and 'total' in filtered_df.columns:
-        revenue_per_project = (
-            filtered_df
-            .groupby('project', as_index=False)['total']
-            .sum()
-            .sort_values('total', ascending=False)
-       )
-
-        revenue_per_project.rename(
-            columns={'total': 'Revenue (£)'},
-            inplace=True
-        )
-    else:
-        revenue_per_project = pd.DataFrame()
-    
-    if not filtered_df.empty and 'team_name' in filtered_df.columns and 'total' in filtered_df.columns:
-        revenue_per_team = (
-            filtered_df
-            .groupby('team_name', as_index=False)['total']
-            .sum()
-            .sort_values('total', ascending=False)
-        )
-
-        revenue_per_team.rename(
-            columns={'team_name': 'Team', 'total': 'Revenue (£)'},
-            inplace=True
-        )
-    else:
-        revenue_per_team = pd.DataFrame()
-
-    if not revenue_per_project.empty or not revenue_per_team.empty:
-        excel_file = to_excel(revenue_per_project, revenue_per_team)
-        st.download_button(
-            label="📥 Download Revenue Summary (Excel)",
-            data=excel_file,
-            file_name=f"revenue_summary_{date_range_str}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-    else:
-        st.info("No revenue data available for export.")
     
     # Display Project and completion
     col_top_left, col_top_right = st.columns([1, 1])
@@ -1590,7 +1526,7 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
             combined_gdf = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True), crs=gdf_list[0].crs)
 
             if "location_map" in filtered_df.columns:
-                active_regions = filtered_df["location_map"].dropna().unique().tolist()
+                active_regions = filtered_df["region"].dropna().unique().tolist()
                 wards_to_select = []
                 for region in active_regions:
                     if region in mapping_region:
@@ -1960,95 +1896,3 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-# -----------------------------
-# 🛠️ Works Section
-# -----------------------------
-st.header("🛠️ Works")
-
-if misc_df is not None:
-    # -----------------------------
-    # Data preparation
-    # -----------------------------
-    filtered_df['item'] = filtered_df['item'].astype(str)
-    misc_df['column_1'] = misc_df['column_1'].astype(str)
-
-    # Map items to work instructions
-    item_to_column_i = misc_df.set_index('column_1')['column_2'].to_dict()
-    poles_df = filtered_df[filtered_df['pole'].notna() & (filtered_df['pole'].astype(str).str.lower() != "nan")].copy()
-    poles_df['Work instructions'] = poles_df['item'].map(item_to_column_i)
-
-    # Keep only rows with valid instructions, comments, and team_name
-    poles_df_clean = poles_df.dropna(subset=['Work instructions', 'comment', 'team_name'])[
-        ['pole', 'segmentcode', 'Work instructions', 'comment', 'team_name']
-    ]
-
-    # -----------------------------
-    # 🔘 Segment selector
-    # -----------------------------
-    segment_options = ['All'] + sorted(poles_df_clean['segmentcode'].dropna().astype(str).unique())
-    selected_segment = st.selectbox("Select a segment code:", segment_options)
-
-    if selected_segment != 'All':
-        poles_df_view = poles_df_clean[poles_df_clean['segmentcode'].astype(str) == selected_segment]
-    else:
-        poles_df_view = poles_df_clean.copy()
-
-    # -----------------------------
-    # 🎯 Pole selector (Cascading)
-    # -----------------------------
-    pole_options = sorted(poles_df_view['pole'].dropna().astype(str).unique())
-    selected_pole = st.selectbox("Select a pole to view details:", ["All"] + pole_options)
-
-    # Filter by selected pole
-    if selected_pole != "All":
-        poles_df_view = poles_df_view[poles_df_view['pole'].astype(str) == selected_pole]
-
-    # Display pole details if one is selected
-    if selected_pole != "All" and not poles_df_view.empty:
-        st.write(f"Details for pole **{selected_pole}**:")
-        st.dataframe(poles_df_view)
-
-    # -----------------------------
-    # 📊 Pie chart (Works breakdown)
-    # -----------------------------
-
-    if not poles_df_view.empty:
-        # Count work instructions and remove NaN / empty strings
-        work_data = (
-            poles_df_view['Work instructions']
-            .astype(str)
-            .str.lower()
-            .replace('nan', pd.NA)
-            .dropna()  # remove NaN
-            .value_counts()
-            .reset_index()
-        )
-        work_data.columns = ['Work instructions', 'total']
-
-        if not work_data.empty:
-            fig_work = px.pie(
-                work_data,
-                names='Work instructions',
-                values='total',
-                hole=0.4
-            )
-            fig_work.update_traces(textinfo='percent+label', textfont_size=16)
-            fig_work.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', showlegend=False)
-            st.plotly_chart(fig_work, use_container_width=True)
-        else:
-            st.info("No valid work instructions available for the selected filters.")
-    # -----------------------------
-    # 📄 Word export
-    # -----------------------------
-    if not poles_df_view.empty:
-        word_file = poles_to_word(poles_df_view)
-        st.download_button(
-            label="⬇️ Download Work Instructions (.docx)",
-            data=word_file,
-            file_name="Pole_Work_Instructions.docx",
-            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        )
-
-general_summary = pd.DataFrame(
-    columns=["Description", "Total Quantity", "Comment"]
-)
