@@ -1128,7 +1128,7 @@ if filtered_df is not None and not filtered_df.empty:
                 erect_mask = df_proj["item"].isin(["Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole."])
                 df_proj.loc[erect_mask, "Quantity_used"] *= 2
                 erect_poles = df_proj[df_proj["item_norm"].isin(erect_norm)]["Quantity_used"].sum()
-                erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm)]["Quantity_used"].sum()
+                erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
 
 
                 recover_mask = df_proj["item"].isin(["Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions"])
@@ -1208,6 +1208,7 @@ if filtered_df is not None and not filtered_df.empty:
         # ---- Breakdown sheets per summary column ----
             breakdown_columns = {
                 "CV7_erect": erect_norm,
+                "CV7_erect_lv": erect_norm_lv,
                 "CV7_recover": recover_norm,
                 "CV8": cv8_norm,  # Special logic
                 "CV7 TX": tx_norm,
@@ -1655,6 +1656,7 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
 
     categories = [
         ("CV7_erect", CV7_erect, "Quantity"),
+        ("CV7_erect_lv", CV7_erect_lv, "Quantity"),
         ("CV7_recover", CV7_recover, "Quantity"),
         ("CV7 Tx", CV7_Tx, "Quantity"),
         ("CV7 OHL CONDUCTOR", CV7_OHL_CONDUCTOR, "Length (Km)"),
