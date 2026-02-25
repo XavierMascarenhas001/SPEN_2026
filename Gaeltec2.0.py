@@ -591,107 +591,102 @@ file_project_mapping = {
     "33kv rebuilt": ["Lanark", "33kV Rebuilt"]
 }
 
-pole_erected_keys = {
-    "Erect Single HV/EHV Pole, up to and including 12 metre pole":"Erect HV pole", 
-    "Erect Single HV/EHV Pole, up to and including 12 metre pole.":"Erect HV pole",
-    "Erect LV Structure Single Pole, up to and including 12 metre pole" :"Erect LV pole",
-    "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole.":"H HV pole"
+CV7_erect = {
+    "Erect Single HV/EHV Pole, up to and including 12 metre pole":"CV7 HV pole", 
+    "Erect Single HV/EHV Pole, up to and including 12 metre pole.":"CV7  HV pole",
+    "Erect LV Structure Single Pole, up to and including 12 metre pole" :"CV7 LV pole",
+    "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole.":"CV7 HV pole"
 }
 
-poles_replaced_keys = {
-    "Recover single pole, up to and including 15 metres in height, and reinstate, all ground conditions":"Recover single pole",
-    "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions":"Recover H pole"
+CV7_recover = {
+    "Recover single pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7",
+    "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7  HV pole"
 }
 
 
 # --- Transformer Mappings ---
-transformer_keys = {
-    "Transformer 1ph 50kVA": "TX 1ph (50kVA)",
-    "Transformer 3ph 50kVA": "TX 3ph (50kVA)",
-    "Transformer 1ph 100kVA": "TX 1ph (100kVA)",
-    "Transformer 1ph 25kVA": "TX 1ph (25kVA)",
-    "Transformer 3ph 200kVA": "TX 3ph (200kVA)",
-    "Transformer 3ph 100kVA": "TX 3ph (100kVA)"
+CV7 Tx = {
+    "Erect pole mounted transformer up to 100kVA 1.ph.": "CV7 Tx",
+    "Erect pole mounted transformer up to 200kVA 3.p.h.": "CV7 Tx",
+    "Erect Voltage Regulator.": "CV7 Tx",
+    "Erect Voltage Transformer (VT), RTU or Repeater": "CV7 Tx",
+    "Erect 12kV/36kV Surge arrestors ( directly mounted ).": "CV7 Tx)",
+    "Remove pole mounted tranformer.": "CV7 Tx)",
+    "Remove platform mounted or 'H' pole mounted transformer.": "CV7 Tx)"
 }
 
 # --- Equipment / Conductor Mappings ---
-conductor_keys = {
-    "Hazel - 50mm² AAAC bare (1000m drums)": "Hazel 50mm²",
-    "Oak - 100mm² AAAC bare (1000m drums)": "Oak 100mm²",
-    "Ash - 150mm² AAAC bare (1000m drums)": "Ash 150mm²",
-    "Poplar - 200mm² AAAC bare (1000m drums)": "Poplar 200mm²",
-    "Upas - 300mm² AAAC bare (1000m drums)": "Upas 300mm²",
-    "Poplar OPPC - 200mm² AAAC equivalent bare": "Poplar OPPC 200mm²",
-    "Upas OPPC - 300mm² AAAC equivalent bare": "Upas OPPC 300mm²",
-    # ACSR
-    "Gopher - 25mm² ACSR bare (1000m drums)": "Gopher 25mm²",
-    "Caton - 25mm² Compacted ACSR bare (1000m drums)": "Caton 25mm²",
-    "Rabbit - 50mm² ACSR bare (1000m drums)": "Rabbit 50mm²",
-    "Wolf - 150mm² ACSR bare (1000m drums)": "Wolf 150mm²",
-    "Horse - 70mm² ACSR bare": "Horse 70mm²",
-    "Dog - 100mm² ACSR bare (1000m drums)": "Dog 100mm²",
-    "Dingo - 150mm² ACSR bare (1000m drums)": "Dingo 150mm²",
+CV7 OHL CONDUCTOR = {
+    "Install bare conductor, run out, sag, terminate, bind in and connect jumpers; <100mm²": "CV7 OHL CONDUCTOR",
+    "Install bare conductor, run out, sag, terminate, bind in and connect jumpers; >=100mm² <200mm²": "CV7 OHL CONDUCTOR",
+    "Install conductor, run out, sag, terminate, clamp in and form jumper loops; >=200mm²": "CV7 OHL CONDUCTOR",
+    "Recover overhead wire and fittings; HV/EHV overhead line or Hardex Pilot (1 conductor)": "CV7 OHL CONDUCTOR",
+    "Recover overhead wire and fittings; HV/EHV overhead line or Hardex Pilot (2 conductor)": "CV7 OHL CONDUCTOR",
+    "Recover overhead wire and fittings; HV/EHV overhead line or Hardex Pilot (3 conductor)": "CV7 OHL CONDUCTOR",
 }
 
     # LV cables per meter
-conductor_2_keys = {
-    "ABC 2 core x 35mm² + 25mm² bare earth (250m drums)": "ABC 2 core x 35mm² + 25mm² bare earth (250m drums)",
-    "ABC 4 core x 35mm² + 25mm² bare earth (250m drums)": "ABC 4 core x 35mm² + 25mm² bare earth (250m drums)",
-    "ABC 2 core x 35mm² (250m drums)": "ABC 2 core x 50mm² (250m drums)",
-    "ABC 2 core x 50mm² (250m drums)": "ABC 2 core x 50mm² (250m drums)",
-    "ABC 2 core x 95mm² + 50mm² bare earth  (300m drums)": "ABC 2 core x 95mm² + 50mm² bare earth  (300m drums)",
-    "ABC 4 core x 35mm² (250m drums)": "ABC 4 core x 35mm² (250m drums)",
-    "ABC 4 core x 50mm² (250m drums)": "ABC 4 core x 50mm² (250m drums)",
-    "ABC 4 core x 95mm² (250m drums)": "ABC 4 core x 95mm² (250m drums)",
-    "ABC 2 core x 50mm² + 50mm² bare earth  (300m drums)": "ABC 2 core x 50mm² + 50mm² bare earth  (300m drums)",
-    "ABC 4 core x 50mm² + 50mm² bare earth  (300m drums)": "ABC 4 core x 50mm² + 50mm² bare earth  (300m drums)",
-    "ABC 4 core x 95mm² + 50mm² bare earth (300m drums)": "ABC 4 core x 95mm² + 50mm² bare earth (300m drums)",
-    "ABC 2 core x 95mm² + 50mm² bare earth  (300m drums)": "ABC 2 core x 95mm² + 50mm² bare earth  (300m drums)",
+CV7 OHL CONDUCTOR LV = {
+    "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 2c": "CV7 OHL CONDUCTOR LV",
+    "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 4c": "CV7 OHL CONDUCTOR LV",
+    "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 2c + Earth": "CV7 OHL CONDUCTOR LV",
+    "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 4c + Earth": "CV7 OHL CONDUCTOR LV",
+    "Recover overhead wires and fittings; LV openwire overhead line (2 conductors)": "CV7 OHL CONDUCTOR LV",
+    "Recover overhead wires and fittings; LV openwire overhead line (3 conductors)": "CV7 OHL CONDUCTOR LV",
+    "Recover overhead wires and fittings; LV openwire overhead line (4 conductors)": "CV7 OHL CONDUCTOR LV",
+    "Recover overhead wires and fittings; LV openwire overhead line (5 conductors)": "CV7 OHL CONDUCTOR LV",
+    "Recover overhead wires and fittings; LV service overhead line (open, concentric or ABC, 2 conductors)": "CV7 OHL CONDUCTOR LV",
+    "Recover overhead wires and fittings; LV service overhead line (open, concentric or ABC, 3 conductors)": "CV7 OHL CONDUCTOR LV",
+    "Recover overhead wires and fittings; LV service overhead line (open, concentric or ABC, 4 conductors)": "CV7 OHL CONDUCTOR LV",
+    "Recover overhead wires and fittings; LV service overhead line (open, concentric or ABC, 5 conductors)": "CV7 OHL CONDUCTOR LV",
+    "Recover cleated service": "CV7 OHL CONDUCTOR LV",
 }
 
 
-equipment_keys = {
-    "Noja": "Noja",
-    "0.5 kVa Tx for Noja": "0.5 kVa Tx for Noja",
-    "11kV PMSW (Soule)": "11kV PMSW (Soule)",
-    "11kv ABSW Hookstick Standard": "11kv ABSW Hookstick Standard",
-    "11kv ABSW Hookstick Spring loaded mech": "11kv ABSW Hookstick Spring loaded mech",
-    "33kv ABSW Hookstick Dependant": "33kv ABSW Hookstick Dependant",
-    "11KV FUSE UNIT - C-TYPE": "11KV FUSE UNIT - C-TYPE",
-    "11KV SOLID LINK - C-TYPE": "11KV SOLID LINK - C-TYPE",
-    "11KV OHL ASL C-TYPE RESET 20A 2 SHOT": "11KV OHL ASL C-TYPE RESET 20A 2 SHOT",
-    "11KV OHL ASL C-TYPE RESET 25A 2 SHOT": "11KV OHL ASL C-TYPE RESET 25A 2 SHOT",
-    "11KV OHL ASL C-TYPE RESET 40A 1 SHOT": "11KV OHL ASL C-TYPE RESET 40A 1 SHOT",
-    "11KV OHL ASL C-TYPE RESET 40A 2 SHOT": "11KV OHL ASL C-TYPE RESET 40A 2 SHOT",
-    "11KV OHL ASL C-TYPE RESET 63A 1 SHOT": "11KV OHL ASL C-TYPE RESET 63A 1 SHOT",
-    "11KV OHL ASL C-TYPE RESET 63A 2 SHOT": "11KV OHL ASL C-TYPE RESET 63A 2 SHOT",
-    "11KV OHL ASL C-TYPE RESET 63A 3 SHOT": "11KV OHL ASL C-TYPE RESET 63A 3 SHOT",
-    "11KV OHL ASL C-TYPE RESET 100A 1 SHOT": "11KV OHL ASL C-TYPE RESET 100A 1 SHOT",
-    "11KV OHL ASL C-TYPE RESET 100A 2 SHOT": "11KV OHL ASL C-TYPE RESET 100A 2 SHOT",
-    "11KV OHL ASL C-TYPE RESET 100A 3 SHOT": "11KV OHL ASL C-TYPE RESET 100A 3 SHOT",
-    "11KV FUSE CARRIER - C-TYPE": "11KV FUSE CARRIER - C-TYPE",
-    "11KV OHL FUSE ELEMENT C-TYPE 15A": "11KV OHL FUSE ELEMENT C-TYPE 15A",
-    "11KV OHL FUSE ELEMENT C-TYPE 25A": "11KV OHL FUSE ELEMENT C-TYPE 25A",
-    "11KV OHL FUSE ELEMENT C-TYPE 30A": "11KV OHL FUSE ELEMENT C-TYPE 30A",
-    "11KV OHL FUSE ELEMENT C-TYPE 40A": "11KV OHL FUSE ELEMENT C-TYPE 40A",
-    "11KV OHL FUSE ELEMENT C-TYPE 50A": "11KV OHL FUSE ELEMENT C-TYPE 50A",
-    "11KV OHL ASL - CHEMICAL ACTUATOR": "11KV OHL ASL - CHEMICAL ACTUATOR",
-    "11KV OHL ASL DJP-TYPE 20A 2 SHOT": "11KV OHL ASL DJP-TYPE 20A 2 SHOT",
-    "11KV OHL ASL DJP-TYPE 25A 1 SHOT": "11KV OHL ASL DJP-TYPE 25A 1 SHOT",
-    "11KV OHL ASL DJP-TYPE 25A 2 SHOT": "11KV OHL ASL DJP-TYPE 25A 2 SHOT",
-    "11KV OHL ASL DJP-TYPE 40A 1 SHOT": "11KV OHL ASL DJP-TYPE 40A 1 SHOT",
-    "11KV OHL ASL DJP-TYPE 40A 2 SHOT": "11KV OHL ASL DJP-TYPE 40A 2 SHOT",
-    "11KV OHL ASL DJP-TYPE 63A 1 SHOT": "11KV OHL ASL DJP-TYPE 63A 1 SHOT",
-    "11KV OHL ASL DJP-TYPE 63A 2 SHOT": "11KV OHL ASL DJP-TYPE 63A 2 SHOT",
-    "11KV OHL ASL DJP-TYPE 63A 3 SHOT": "11KV OHL ASL DJP-TYPE 63A 3 SHOT",
-    "11KV OHL ASL DJP-TYPE 100A 1 SHOT": "11KV OHL ASL DJP-TYPE 100A 1 SHOT",
-    "11KV OHL ASL DJP-TYPE 100A 2 SHOT": "11KV OHL ASL DJP-TYPE 100A 2 SHOT",
-    "11KV OHL ASL DJP-TYPE 100A 3 SHOT": "11KV OHL ASL DJP-TYPE 100A 3 SHOT",
-    "11KV OHL FUSE ELEMENT DJP-TYPE 15A": "11KV OHL FUSE ELEMENT DJP-TYPE 15A",
-    "11KV OHL FUSE ELEMENT DJP-TYPE 25A": "11KV OHL FUSE ELEMENT DJP-TYPE 25A",
-    "11KV OHL FUSE ELEMENT DJP-TYPE 30A": "11KV OHL FUSE ELEMENT DJP-TYPE 30A",
-    "11KV OHL FUSE ELEMENT DJP-TYPE 40A": "11KV OHL FUSE ELEMENT DJP-TYPE 40A",
-    "11KV OHL FUSE ELEMENT DJP-TYPE 50A": "11KV OHL FUSE ELEMENT DJP-TYPE 50A",
+CV7 SWITCHGEAR = {
+    "Erect 11kV/33kV ABSW": "CV7 SWITCHGEAR",
+    "Erect 11kV Remote Controlled Switch Disconnector ( Soule Auguste ) or Auto Reclosure unit c/w VT, Aerial, RTU & umbilical cable.": "CV7 SWITCHGEAR",
+    "Erect 1.ph fuse units at single tee off pole or in line pole.": "CV7 SWITCHGEAR",
+    "Erect 3.ph fuse units at single tee off pole or in line pole.": "CV7 SWITCHGEAR",
+    "Additional cost for fitting fuse outrigger bracket.": "CV7 SWITCHGEAR",
+    "Remove 11kV/33kV ABSW": "CV7 SWITCHGEAR",
+}
+
+CV7_UG = {
+    "Installation of cable only in trench dug by others; 11kV Cable 3 x 1 core.": "CV7 UG 11 kV",
+    "Install cable in existing duct; 11kV Cable 3 x 1 core.": "CV7 UG 11 kV",
+    "Installation of cable only in trench dug by others; 33kV Cable 3 x 1 core.": "CV7 UG 33 kV",
+    "Install cable in existing duct; 33kV Cable 3 x 1 core.": "CV7 UG 33 kV",
+    "Installation of cable only in trench dug by others; LV Cable Large or 11kV Cable 1 x 3 Core": "CV7 UG",
+    "Install cable in existing duct; LV Cable Large or 11kV Cable 1 x 3 Core": "CV7 UG",
+    "Installation of cable only in trench dug by others; LV Service, Small LV or Pilot Cable.": "CV7 UG LV Service",
+    "Install cable in existing duct; LV Service, Small LV or Pilot Cable.": "CV7 UG LV Service",
+}
+
+CV7_CB = {
+    "Remove Auto Reclosure.": "CV7 CB",
+}
+
+CV31 = {
+    "Replace / Fit safety or warning sign, number plates or name plate": "CV31",
+    "Barbed Wire Wrap ACD (or Enhanced) single pole or stay - Replace/Repair": "CV31",
+    "Steelwork bonding repair / fit.": "CV31",
+    "Replace LV/HV/Earth guard missing / damaged.": "CV31",
+}
+
+
+CV8 = {
+    "Tighten existing stay.": "CV8",
+    "Replace / Fit high visibility stay guard": "CV8",
+    "Additional cost for fitting Stay Outrigger Bracket": "CV8",
+    "Additional cost for fitting Angle / Terminal stay attachment plates on Heavy Construction as SP4009862": "CV8",
+    "Recover and reinstate stay position,all ground conditions.": "CV8",
+    "Fit foundation block to existing pole.": "CV8",
+    "Fit bog shoe foundation to existing single pole.": "CV8",
+    "Replace jumper / dropper mechanical connection with compression connection": "CV8",
+    "Replace jumper / dropper with live line bail and flexible jumper conductor": "CV8",
+    "Replace / Repair conductor with mid span joint using compression connection": "CV8",
+    "Conductor repair; piece in conductor including compression joints": "CV8",
 }
 
 
@@ -1668,12 +1663,15 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
     convert_to_miles = st.checkbox("Convert Equipment/Conductor Length to Miles")
 
     categories = [
-        ("Poles _erected 🪵", pole_erected_keys, "Quantity"),
-        ("Poles _replaced 🪵", poles_replaced_keys, "Quantity"),
-        ("Transformers ⚡🏭", transformer_keys, "Quantity"),
-        ("Conductors", conductor_keys, "Length (Km)"),
-        ("Conductors_2", conductor_2_keys, "Length (Km)"),
-        ("Equipment", equipment_keys, "Quantity"),
+        ("CV7_erect", CV7_erect, "Quantity"),
+        ("CV7_recover", CV7_recover, "Quantity"),
+        ("CV7 Tx", CV7 Tx, "Quantity"),
+        ("CV7 OHL CONDUCTOR", CV7 OHL CONDUCTOR, "Length (Km)"),
+        ("CV7 OHL CONDUCTOR LV", CV7 OHL CONDUCTOR LV, "Length (Km)"),
+        ("CV7 SWITCHGEAR", CV7 SWITCHGEAR, "Quantity"),
+        ("CV7_UG", CV7_UG, "Quantity"),
+        ("CV7_CB", CV7_CB, "Quantity"),
+        ("CV31", CV31, "Quantity"),
     ]
 
     def sanitize_sheet_name(name: str) -> str:
