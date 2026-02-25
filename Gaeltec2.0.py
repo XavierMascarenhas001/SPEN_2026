@@ -626,7 +626,7 @@ CV7_OHL_CONDUCTOR = {
 }
 
     # LV cables per meter
-CV7_OHL_CONDUCTOR LV = {
+CV7_OHL_CONDUCTOR_LV = {
     "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 2c": "CV7 OHL CONDUCTOR LV",
     "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 4c": "CV7 OHL CONDUCTOR LV",
     "Install conductor, run out, sag, terminate, clamp in and connect jumpers; 2c + Earth": "CV7 OHL CONDUCTOR LV",
@@ -1667,7 +1667,7 @@ if {'datetouse_dt','done', 'team_name', 'total'}.issubset(filtered_df.columns):
         ("CV7_recover", CV7_recover, "Quantity"),
         ("CV7 Tx", CV7_Tx, "Quantity"),
         ("CV7 OHL CONDUCTOR", CV7_OHL_CONDUCTOR, "Length (Km)"),
-        ("CV7 OHL CONDUCTOR LV", CV7_OHL_CONDUCTOR LV, "Length (Km)"),
+        ("CV7 OHL CONDUCTOR LV", CV7_OHL_CONDUCTOR_LV, "Length (Km)"),
         ("CV7 SWITCHGEAR", CV7_SWITCHGEAR, "Quantity"),
         ("CV7_UG", CV7_UG, "Quantity"),
         ("CV7_CB", CV7_CB, "Quantity"),
