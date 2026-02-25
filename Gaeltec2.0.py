@@ -1103,10 +1103,10 @@ if filtered_df is not None and not filtered_df.empty:
             export_df["item_norm"] = export_df["item"].apply(normalize_item)
 
             # Normalize key lists
-            erect_norm = [normalize_item(i) for i in pole_erected_keys]
-            recover_norm = [normalize_item(i) for i in poles_replaced_keys]
-            conductor_hv_norm = [normalize_item(i) for i in conductor_keys]
-            conductor_lv_norm = [normalize_item(i) for i in conductor_2_keys]
+            erect_norm = [normalize_item(i) for i in CV7_erect]
+            recover_norm = [normalize_item(i) for i in CV7_recover]
+            conductor_hv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR]
+            conductor_lv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR_LV]
 
             # Transformer mappings
             tx_1ph_keys = [
