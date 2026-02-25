@@ -1102,24 +1102,18 @@ if filtered_df is not None and not filtered_df.empty:
             # Normalize items
             export_df["item_norm"] = export_df["item"].apply(normalize_item)
 
-            # Normalize key lists
-            erect_norm = [normalize_item(i) for i in CV7_erect]
-            recover_norm = [normalize_item(i) for i in CV7_recover]
-            conductor_hv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR]
-            conductor_lv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR_LV]
 
-            # Transformer mappings
-            tx_1ph_keys = [
-                normalize_item("Transformer 1ph 50kVA"),
-                normalize_item("Transformer 1ph 100kVA"),
-                normalize_item("Transformer 1ph 25kVA"),
-            ]
-
-            tx_3ph_keys = [
-                normalize_item("Transformer 3ph 50kVA"),
-                normalize_item("Transformer 3ph 200kVA"),
-                normalize_item("Transformer 3ph 100kVA"),
-            ]
+            # Normalize key lists (USING YOUR NEW MAPPINGS)
+            erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
+            recover_norm = [normalize_item(i) for i in CV7_recover.keys()]
+            tx_norm = [normalize_item(i) for i in CV7_Tx.keys()]
+            conductor_hv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR.keys()]
+            conductor_lv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR_LV.keys()]
+            switchgear_norm = [normalize_item(i) for i in CV7_SWITCHGEAR.keys()]
+            ug_norm = [normalize_item(i) for i in CV7_UG.keys()]
+            cb_norm = [normalize_item(i) for i in CV7_CB.keys()]
+            cv31_norm = [normalize_item(i) for i in CV31.keys()]
+            cv8_norm = [normalize_item(i) for i in CV8.keys()]
 
             # --- Build summary per project ---
             summary_rows = []
@@ -1132,56 +1126,36 @@ if filtered_df is not None and not filtered_df.empty:
                 # RECOVER POLES
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_norm)]["Quantity_used"].sum()
 
-                # POLES REFURB (not erect and not recover, but pole-related)
-                pole_series = df_proj["pole"].dropna().astype(str).str.strip()
-                # Unique poles in project
-                all_poles_set = set(pole_series)
-
-                # Poles used in Erect
-                erect_poles_set = set(
-                    df_proj[df_proj["item_norm"].isin(erect_norm)]["pole"]
-                    .dropna()
-                    .astype(str)
-                    .str.strip()
-                )
-
-                # Poles used in Recover
-                recover_poles_set = set(
-                    df_proj[df_proj["item_norm"].isin(recover_norm)]["pole"]
-                    .dropna()
-                    .astype(str)
-                    .str.strip()
-                )
-
-                # Poles Refurb = poles NOT in Erect nor Recover
-                refurb_poles_set = all_poles_set - erect_poles_set - recover_poles_set
-                poles_refurb = len(refurb_poles_set)
 
                 # TRANSFORMERS
-                pte_1ph = df_proj[df_proj["item_norm"].isin(tx_1ph_keys)]["Quantity_used"].sum()
-                pte_3ph = df_proj[df_proj["item_norm"].isin(tx_3ph_keys)]["Quantity_used"].sum()
+                tx_total = df_proj[df_proj["item_norm"].isin(tx_norm)]["Quantity_used"].sum()
 
                 # CONDUCTORS
                 conductor_hv = df_proj[df_proj["item_norm"].isin(conductor_hv_norm)]["Quantity_used"].sum()
                 conductor_lv = df_proj[df_proj["item_norm"].isin(conductor_lv_norm)]["Quantity_used"].sum()
-                # --- NEW TASK COLUMNS ---
-                noja_keys = [normalize_item("Noja"), normalize_item("0.5 kVa Tx for Noja")]
-                soule_keys = [normalize_item("11kV PMSW (Soule)")]
-                absw_keys = [
-                    normalize_item("11kv ABSW Hookstick Standard"),
-                    normalize_item("11kv ABSW Hookstick Spring loaded mech"),
-                    normalize_item("33kv ABSW Hookstick Dependant")
-                ]
-                fuse_11kv_keys = [
-                    normalize_item("Erect 3.ph fuse units at single tee off pole or in line pole."),
-                    normalize_item("Erect 1.ph fuse units at single tee off pole or in line pole.")
-                ]
 
-                noja_sum = df_proj[df_proj["item_norm"].isin(noja_keys)]["Quantity_used"].sum()
-                soule_sum = df_proj[df_proj["item_norm"].isin(soule_keys)]["Quantity_used"].sum()
-                absw_sum = df_proj[df_proj["item_norm"].isin(absw_keys)]["Quantity_used"].sum()
-                fuse_11kv_sum = df_proj[df_proj["item_norm"].isin(fuse_11kv_keys)]["Quantity_used"].sum()
+                # SWITCHGEAR
+                switchgear_total = df_proj[df_proj["item_norm"].isin(switchgear_norm)]["Quantity_used"].sum()
 
+                # UG
+                ug_total = df_proj[df_proj["item_norm"].isin(ug_norm)]["Quantity_used"].sum()
+
+                # CB
+                cb_total = df_proj[df_proj["item_norm"].isin(cb_norm)]["Quantity_used"].sum()
+
+                # CV31
+                cv31_total = df_proj[df_proj["item_norm"].isin(cv31_norm)]["Quantity_used"].sum()
+        
+                all_poles_set = set(df_proj["pole"].dropna().astype(str).str.strip())
+                erect_poles_set = set(df_proj[df_proj["item_norm"].isin(erect_norm)]["pole"].dropna().astype(str).str.strip())
+                recover_poles_set = set(df_proj[df_proj["item_norm"].isin(recover_norm)]["pole"].dropna().astype(str).str.strip())
+                candidate_poles = all_poles_set - erect_poles_set - recover_poles_set
+
+                df_candidate = df_proj[df_proj["pole"].astype(str).str.strip().isin(candidate_poles)]
+                df_candidate_cv8 = df_candidate[df_candidate["item_norm"].isin(cv8_norm)]
+                cv31_poles = set(df_candidate[df_candidate["item_norm"].isin(cv31_norm)]["pole"].dropna().astype(str).str.strip())
+                poles_refurb = df_candidate_cv8[~df_candidate_cv8["pole"].astype(str).str.strip().isin(cv31_poles)]["Quantity_used"].sum()
+                
                 # VALUE (if exists)
                 if "total" in df_proj.columns:
                     total_value = pd.to_numeric(df_proj["total"], errors="coerce").fillna(0).sum()
@@ -1190,17 +1164,16 @@ if filtered_df is not None and not filtered_df.empty:
 
                 summary_rows.append({
                     "Project": project,
-                    "Erect Poles": erect_poles,
-                    "Recover Poles": recover_poles,
-                    "Poles Refurb": poles_refurb,
-                    "PTE Installed 1ph": pte_1ph,
-                    "PTE Installed 3ph": pte_3ph,
-                    "Conductor HV Installed (Km)": conductor_hv,
-                    "Conductor LV Installed (Km)": conductor_lv,
-                    "Noja": noja_sum,
-                    "Soule": soule_sum,
-                    "ABSW": absw_sum,
-                    "11 kV fuse": fuse_11kv_sum,
+                    "CV7_erect": erect_poles,
+                    "CV7 Recover": recover_poles,
+                    "CV8": poles_refurb,
+                    "CV7 TX": tx_total,
+                    "CV7 HV Conductor": conductor_hv,
+                    "CV7 LV Conductor": conductor_lv,
+                    "CV7 Switchgear": switchgear_total,
+                    "CV7 UG": ug_total,
+                    "CV7 CB": cb_total,
+                    "CV31": cv31_total,
                     "Total Value (£)": total_value
                 })
 
@@ -1223,17 +1196,16 @@ if filtered_df is not None and not filtered_df.empty:
 
         # ---- Breakdown sheets per summary column ----
             breakdown_columns = {
-                "Erect Poles": erect_norm,
-                "Recover Poles": recover_norm,
-                "Poles Refurb": None,  # Special logic
-                "PTE Installed 1ph": tx_1ph_keys,
+                "CV7_erect": erect_norm,
+                "CV7_recover": recover_norm,
+                "CV8": cv8_norm,  # Special logic
+                "CV7 TX": tx_norm,
                 "PTE Installed 3ph": tx_3ph_keys,
-                "Conductor HV Installed (Km)": conductor_hv_norm,
-                "Conductor LV Installed (Km)": conductor_lv_norm,
-                "Noja": noja_keys,
-                "Soule": soule_keys,
-                "ABSW": absw_keys,
-                "11 kV fuse": fuse_11kv_keys,
+                "CV7 HV Conductor": conductor_hv_norm,
+                "CV7 LV Conductor": conductor_lv_norm,
+                "CV7 Switchgear": switchgear_norm,
+                "CV7 UG": ug_norm,
+                "CV31": cv31_norm,
             }
 
             for col_name, keys in breakdown_columns.items():
@@ -1244,8 +1216,14 @@ if filtered_df is not None and not filtered_df.empty:
                     all_poles_set = set(export_df["pole"].dropna().astype(str).str.strip())
                     erect_poles_set = set(export_df[export_df["item_norm"].isin(erect_norm)]["pole"].dropna().astype(str).str.strip())
                     recover_poles_set = set(export_df[export_df["item_norm"].isin(recover_norm)]["pole"].dropna().astype(str).str.strip())
-                    refurb_poles_set = all_poles_set - erect_poles_set - recover_poles_set
-                    df_breakdown = export_df[export_df["pole"].isin(refurb_poles_set)]
+                    candidate_poles = all_poles_set - erect_poles_set - recover_poles_set
+                    # Step 3: Filter rows for candidate poles
+                    df_candidate = export_df[export_df["pole"].astype(str).str.strip().isin(candidate_poles)]
+                    # Step 4: Only keep rows that are in CV8
+                    df_candidate_cv8 = df_candidate[df_candidate["item_norm"].isin(cv8_norm)]
+                    cv31_poles = set(df_candidate[df_candidate["item_norm"].isin(cv31_norm)]["pole"].dropna().astype(str).str.strip())
+                    # Step 5: Exclude any pole that has a CV31-exclusive item
+                    df_breakdown = df_candidate_cv8[~df_candidate_cv8["pole"].astype(str).str.strip().isin(cv31_poles)]
                 else:
                     df_breakdown = export_df[export_df["item_norm"].isin(keys)]
 
