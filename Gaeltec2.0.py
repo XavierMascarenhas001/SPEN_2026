@@ -594,8 +594,11 @@ file_project_mapping = {
 CV7_erect = {
     "Erect Single HV/EHV Pole, up to and including 12 metre pole":"CV7 HV pole", 
     "Erect Single HV/EHV Pole, up to and including 12 metre pole.":"CV7  HV pole",
-    "Erect LV Structure Single Pole, up to and including 12 metre pole" :"CV7 LV pole",
     "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole.":"CV7 HV pole"
+}
+
+CV7_erect_lv = {
+    "Erect LV Structure Single Pole, up to and including 12 metre pole" :"CV7 LV pole",
 }
 
 CV7_recover = {
@@ -1105,6 +1108,7 @@ if filtered_df is not None and not filtered_df.empty:
 
             # Normalize key lists (USING YOUR NEW MAPPINGS)
             erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
+            erect_norm_lv = [normalize_item(i) for i in CV7_erect_lv.keys()]
             recover_norm = [normalize_item(i) for i in CV7_recover.keys()]
             tx_norm = [normalize_item(i) for i in CV7_Tx.keys()]
             conductor_hv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR.keys()]
@@ -1121,11 +1125,17 @@ if filtered_df is not None and not filtered_df.empty:
             for project, df_proj in export_df.groupby("project"):
 
                 # ERECT POLES
+                erect_mask = df_proj["item"].isin(["Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole."])
+                df_proj.loc[erect_mask, "Quantity_used"] *= 2
                 erect_poles = df_proj[df_proj["item_norm"].isin(erect_norm)]["Quantity_used"].sum()
+                erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm)]["Quantity_used"].sum()
+
+
+                recover_mask = df_proj["item"].isin(["Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions"])
+                df_proj.loc[recover_mask, "Quantity_used"] *= 2
 
                 # RECOVER POLES
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_norm)]["Quantity_used"].sum()
-
 
                 # TRANSFORMERS
                 tx_total = df_proj[df_proj["item_norm"].isin(tx_norm)]["Quantity_used"].sum()
@@ -1165,6 +1175,7 @@ if filtered_df is not None and not filtered_df.empty:
                 summary_rows.append({
                     "Project": project,
                     "CV7_erect": erect_poles,
+                    "CV7_erect_lv": erect_poles_lv,
                     "CV7 Recover": recover_poles,
                     "CV8": poles_refurb,
                     "CV7 TX": tx_total,
