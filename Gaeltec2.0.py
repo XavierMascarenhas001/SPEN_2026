@@ -716,12 +716,15 @@ summary_items = [
 ]
 
 categories = [
-    ("Poles _erected 🪵", pole_erected_keys, "Quantity"),
-    ("Poles _replaced 🪵", poles_replaced_keys, "Quantity"),
-    ("Transformers ⚡🏭", transformer_keys, "Quantity"),
-    ("Conductors", conductor_keys, "Length (Km)"),
-    ("Conductors_2", conductor_2_keys, "Length (Km)"),
-    ("Equipment", equipment_keys, "Quantity"),
+    ("CV7_erect", CV7_erect, "Quantity"),
+    ("CV7_recover", CV7_recover, "Quantity"),
+    ("CV7 Tx", CV7_Tx, "Quantity"),
+    ("CV7 OHL CONDUCTOR", CV7_OHL_CONDUCTOR, "Length (Km)"),
+    ("CV7 OHL CONDUCTOR LV", CV7_OHL_CONDUCTOR_LV, "Length (Km)"),
+    ("CV7 SWITCHGEAR", CV7_SWITCHGEAR, "Quantity"),
+    ("CV7_UG", CV7_UG, "Quantity"),
+    ("CV7_CB", CV7_CB, "Quantity"),
+    ("CV31", CV31, "Quantity"),
 ]
 
 column_rename_map = {
