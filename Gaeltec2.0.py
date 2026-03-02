@@ -596,9 +596,7 @@ CV7_erect = {
     "Erect Single HV/EHV Pole, up to and including 12 metre pole.":"CV7  HV pole",
     "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole.":"CV7 HV pole"
 }
-CV7_erect_H = {
-    "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole.":"CV7 HV pole"
-}
+
 
 CV7_erect_lv = {
     "Erect LV Structure Single Pole, up to and including 12 metre pole" :"CV7 LV pole",
@@ -608,11 +606,6 @@ CV7_recover = {
     "Recover single pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7",
     "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7  HV pole"
 }
-
-CV7_recover_H = {
-    "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7  HV pole"
-}
-
 
 
 # --- Transformer Mappings ---
