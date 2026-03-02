@@ -1598,10 +1598,8 @@ with col_map:
 
     categories = [
         ("CV7_erect", CV7_erect, "Quantity"),
-        ("CV7_erect_H", CV7_erect_H, "Quantity"),
         ("CV7_erect_lv", CV7_erect_lv, "Quantity"),
         ("CV7_recover", CV7_recover, "Quantity"),
-        ("CV7_recover_H", CV7_recover_H, "Quantity"),
         ("CV7 Tx", CV7_Tx, "Quantity"),
         ("CV7 OHL CONDUCTOR", CV7_OHL_CONDUCTOR, "Length (Km)"),
         ("CV7 OHL CONDUCTOR LV", CV7_OHL_CONDUCTOR_LV, "Length (Km)"),
