@@ -1136,13 +1136,19 @@ if filtered_df is not None and not filtered_df.empty:
                 df_proj = df_proj.copy()
 
                 # ERECT POLES
+                # Multiplier
                 df_proj["multiplier"] = 1
-                df_proj.loc[df_proj["item_norm"].isin(erect_norm_H), "multiplier"] = 2
+                # ONLY double the H erect item
+                df_proj.loc[
+                    df_proj["item_norm"] == normalize_item(
+                        "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole."
+                    ),
+                    "multiplier"
+                ] = 2
+                # If you also want recover H doubled:
                 df_proj.loc[df_proj["item_norm"].isin(recover_norm_H), "multiplier"] = 2
+
                 df_proj["adj_qty"] = df_proj["Quantity_used"] * df_proj["multiplier"]
-                erect_all_norm = erect_norm + erect_norm_H
-                recover_all_norm = recover_norm + recover_norm_H
-                erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["adj_qty"].sum()
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["adj_qty"].sum()
                 erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
 
@@ -1619,7 +1625,9 @@ with col_map:
         name = re.sub(r'[:\\/*?\[\]\n\r]', '_', name)
         name = re.sub(r'[^\x00-\x7F]', '_', name)  # remove Unicode like m²
         return name[:31]
-
+        
+    erect_h_items = set(CV7_erect_H.keys())
+    recover_h_items = set(CV7_recover_H.keys())
 
     for cat_name, keys, y_label in categories:
 
@@ -1633,6 +1641,14 @@ with col_map:
 
         mask = filtered_df['item'].astype(str).str.contains(pattern, case=False, na=False)
         sub_df = filtered_df[mask]
+        # Default multiplier
+        sub_df["multiplier"] = 1
+
+        # Double H erect items
+        sub_df.loc[sub_df["item"].isin(erect_h_items), "multiplier"] = 2
+
+        # Double H recover items
+        sub_df.loc[sub_df["item"].isin(recover_h_items), "multiplier"] = 2
 
         if sub_df.empty:
             st.info(f"No data found for {cat_name}")
