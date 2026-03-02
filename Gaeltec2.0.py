@@ -1135,9 +1135,6 @@ if filtered_df is not None and not filtered_df.empty:
                 df_proj = df_proj.copy()
 
                 # ERECT POLES
-                erect_all_norm = list(set(normalize_item(i) for i in CV7_erect.keys()))
-                recover_all_norm = list(set(normalize_item(i) for i in CV7_recover.keys()))
-
                 erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["Quantity_used"].sum()
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["Quantity_used"].sum()
                 erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
@@ -1197,12 +1194,8 @@ if filtered_df is not None and not filtered_df.empty:
                 })
 
             # Create DataFrame
-            final_summary = pd.DataFrame(summary_rows)
+            final_summary = pd.DataFrame(summary_rows).sort_values("Project")
             
-
-            # Sort by project
-            final_summary = final_summary.sort_values("Project")
-
             # Write to Excel
             # --- Add Total Row ---
             total_row = final_summary.select_dtypes(include='number').sum().to_dict()
