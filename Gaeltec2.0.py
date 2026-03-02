@@ -594,6 +594,8 @@ file_project_mapping = {
 CV7_erect = {
     "Erect Single HV/EHV Pole, up to and including 12 metre pole":"CV7 HV pole", 
     "Erect Single HV/EHV Pole, up to and including 12 metre pole.":"CV7  HV pole",
+}
+CV7_erect_H = {
     "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole.":"CV7 HV pole"
 }
 
@@ -603,8 +605,12 @@ CV7_erect_lv = {
 
 CV7_recover = {
     "Recover single pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7",
+}
+
+CV7_recover_H = {
     "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7  HV pole"
 }
+
 
 
 # --- Transformer Mappings ---
@@ -1108,8 +1114,10 @@ if filtered_df is not None and not filtered_df.empty:
 
             # Normalize key lists (USING YOUR NEW MAPPINGS)
             erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
+            erect_norm_H = [normalize_item(i) for i in CV7_erect_H.keys()]
             erect_norm_lv = [normalize_item(i) for i in CV7_erect_lv.keys()]
             recover_norm = [normalize_item(i) for i in CV7_recover.keys()]
+            recover_norm_H = [normalize_item(i) for i in CV7_recover_H.keys()]
             tx_norm = [normalize_item(i) for i in CV7_Tx.keys()]
             conductor_hv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR.keys()]
             conductor_lv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR_LV.keys()]
@@ -1123,16 +1131,17 @@ if filtered_df is not None and not filtered_df.empty:
             summary_rows = []
 
             for project, df_proj in export_df.groupby("project"):
+                df_proj = df_proj.copy()
 
                 # ERECT POLES
-                erect_mask = df_proj["item"].isin(["Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole."])
-                df_proj.loc[erect_mask, "Quantity_used"] *= 2
+                erect_h_mask = df_proj["item_norm"].isin(erect_norm_H)
+                df_proj.loc[erect_h_mask, "Quantity_used"] *= 2
                 erect_poles = df_proj[df_proj["item_norm"].isin(erect_norm)]["Quantity_used"].sum()
                 erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
 
 
-                recover_mask = df_proj["item"].isin(["Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions"])
-                df_proj.loc[recover_mask, "Quantity_used"] *= 2
+                recover_h_mask = df_proj["item_norm"].isin(recover_norm_H)
+                df_proj.loc[recover_h_mask, "Quantity_used"] *= 2
 
                 # RECOVER POLES
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_norm)]["Quantity_used"].sum()
