@@ -594,6 +594,7 @@ file_project_mapping = {
 CV7_erect = {
     "Erect Single HV/EHV Pole, up to and including 12 metre pole":"CV7 HV pole", 
     "Erect Single HV/EHV Pole, up to and including 12 metre pole.":"CV7  HV pole",
+    "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole.":"CV7 HV pole"
 }
 CV7_erect_H = {
     "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole.":"CV7 HV pole"
@@ -605,6 +606,7 @@ CV7_erect_lv = {
 
 CV7_recover = {
     "Recover single pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7",
+    "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions":"CV7  HV pole"
 }
 
 CV7_recover_H = {
