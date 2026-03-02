@@ -1100,19 +1100,6 @@ if filtered_df is not None and not filtered_df.empty:
         # ---- Summary sheet ----
         if "Quantity_used" in export_df.columns:
 
-
-            # DEBUG: Check what items are in your data
-            print("\n" + "="*50)
-            print("DEBUG: Items in export_df")
-            print("="*50)
-            print("Unique items in data:")
-            for item in sorted(export_df["item"].unique()):
-                print(f"  - '{item}'")
-            
-            print("\nUnique normalized items in data:")
-            for item in sorted(export_df["item_norm"].unique()):
-                print(f"  - '{item}'")
-
             # Ensure numeric
             export_df["Quantity_used"] = pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0)
             export_df["item_norm"] = export_df["item"].apply(normalize_item)
@@ -1122,27 +1109,6 @@ if filtered_df is not None and not filtered_df.empty:
             erect_h_items_norm = [normalize_item(k) for k in erect_h_items_raw]
             recover_h_items_raw = [k for k in CV7_recover.keys() if "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions" in k]
             recover_h_items_norm = [normalize_item(k) for k in recover_h_items_raw]
-
-            # SIMPLE DEBUG - Show what we're looking for
-            print("\nH items we're looking for:")
-            print(f"  Erect H items (raw): {erect_h_items_raw}")
-            print(f"  Erect H items (norm): {erect_h_items_norm}")
-            print(f"  Recover H items (raw): {recover_h_items_raw}")
-            print(f"  Recover H items (norm): {recover_h_items_norm}")
-
-            # SIMPLE DEBUG - Check if any match
-            for norm_item in erect_h_items_norm:
-                matches = export_df[export_df['item_norm'] == norm_item]
-                if not matches.empty:
-                    print(f"\nFound matches for '{norm_item}':")
-                    print(matches[['item', 'item_norm', 'Quantity_used']].head())
-
-            for norm_item in recover_h_items_norm:
-                matches = export_df[export_df['item_norm'] == norm_item]
-                if not matches.empty:
-                    print(f"\nFound matches for '{norm_item}':")
-                    print(matches[['item', 'item_norm', 'Quantity_used']].head())
-            
             
             erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
             erect_norm_lv = [normalize_item(i) for i in CV7_erect_lv.keys()]
@@ -1245,10 +1211,6 @@ if filtered_df is not None and not filtered_df.empty:
             # Create DataFrame
             final_summary = pd.DataFrame(summary_rows)
             
-            print("\n" + "="*50)
-            print("FINAL SUMMARY:")
-            print(final_summary)
-            print("="*50)
 
             # Sort by project
             final_summary = final_summary.sort_values("Project")
