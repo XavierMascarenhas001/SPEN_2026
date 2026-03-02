@@ -1207,16 +1207,6 @@ if filtered_df is not None and not filtered_df.empty:
             final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1)
             ws_summary = writer.book["Summary"]
 
-            # Write to Excel
-            # --- Add Total Row ---
-            total_row = final_summary.select_dtypes(include='number').sum().to_dict()
-            total_row["Project"] = "Total"  # Label for the total row
-
-            # Append total row
-            final_summary = pd.concat([final_summary, pd.DataFrame([total_row])], ignore_index=True)
-            final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1)
-            ws_summary = writer.book["Summary"]
-
 
         # ---- Breakdown sheets per summary column ----
             breakdown_columns = {
