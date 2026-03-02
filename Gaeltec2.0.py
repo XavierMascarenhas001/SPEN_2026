@@ -1169,7 +1169,7 @@ if filtered_df is not None and not filtered_df.empty:
                 df_candidate = df_proj[df_proj["pole"].astype(str).str.strip().isin(candidate_poles)]
                 df_candidate_cv8 = df_candidate[df_candidate["item_norm"].isin(cv8_norm)]
                 cv31_poles = set(df_candidate[df_candidate["item_norm"].isin(cv31_norm)]["pole"].dropna().astype(str).str.strip())
-                poles_refurb = df_candidate_cv8[~df_candidate_cv8["pole"].astype(str).str.strip().isin(cv31_poles)]["adj_qty"].sum()
+                poles_refurb = df_candidate_cv8[~df_candidate_cv8["pole"].astype(str).str.strip().isin(cv31_poles)]["Quantity_used"].sum()
                 
                 print(f"  CV8 total: {poles_refurb}")
                 
