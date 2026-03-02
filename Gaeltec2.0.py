@@ -1135,13 +1135,13 @@ if filtered_df is not None and not filtered_df.empty:
                 matches = export_df[export_df['item_norm'] == norm_item]
                 if not matches.empty:
                     print(f"\nFound matches for '{norm_item}':")
-                    print(matches[['item', 'item_norm', 'Quantity_used']])
+                    print(matches[['item', 'item_norm', 'Quantity_used']].head())
 
             for norm_item in recover_h_items_norm:
                 matches = export_df[export_df['item_norm'] == norm_item]
                 if not matches.empty:
                     print(f"\nFound matches for '{norm_item}':")
-                    print(matches[['item', 'item_norm', 'Quantity_used']])
+                    print(matches[['item', 'item_norm', 'Quantity_used']].head())
             
             
             erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
@@ -1166,16 +1166,27 @@ if filtered_df is not None and not filtered_df.empty:
                 # Multiplier
                 df_proj["adj_qty"] = df_proj["Quantity_used"]
                 h_erect_mask = df_proj["item_norm"].isin(erect_h_items_norm)
-                # ONLY double the H erect item
-                df_proj.loc[h_erect_mask, "adj_qty"] = df_proj.loc[h_erect_mask, "Quantity_used"] * 2
-                # If you also want recover H doubled:
+                if h_erect_mask.any():
+                    print(f"  Found {h_erect_mask.sum()} H erect items")
+                    print(f"  Before multiplier - sum: {df_proj.loc[h_erect_mask, 'Quantity_used'].sum()}")
+                    df_proj.loc[h_erect_mask, "adj_qty"] = df_proj.loc[h_erect_mask, "Quantity_used"] * 2
+                    print(f"  After multiplier - sum: {df_proj.loc[h_erect_mask, 'adj_qty'].sum()}")
+                
                 h_recover_mask = df_proj["item_norm"].isin(recover_h_items_norm)
-                df_proj.loc[h_recover_mask, "adj_qty"] = df_proj.loc[h_recover_mask, "Quantity_used"] * 2
+                if h_recover_mask.any():
+                    print(f"  Found {h_recover_mask.sum()} H recover items")
+                    print(f"  Before multiplier - sum: {df_proj.loc[h_recover_mask, 'Quantity_used'].sum()}")
+                    df_proj.loc[h_recover_mask, "adj_qty"] = df_proj.loc[h_recover_mask, "Quantity_used"] * 2
+                    print(f"  After multiplier - sum: {df_proj.loc[h_recover_mask, 'adj_qty'].sum()}")
 
                 erect_all_norm = list(set([normalize_item(i) for i in CV7_erect.keys()]))
                 recover_all_norm = list(set([normalize_item(i) for i in CV7_recover.keys()]))
+                
                 erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["adj_qty"].sum()
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["adj_qty"].sum()
+                
+                print(f"  Final totals - erect: {erect_poles}, recover: {recover_poles}")
+                
                 erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
 
                 # TRANSFORMERS
@@ -1207,6 +1218,8 @@ if filtered_df is not None and not filtered_df.empty:
                 cv31_poles = set(df_candidate[df_candidate["item_norm"].isin(cv31_norm)]["pole"].dropna().astype(str).str.strip())
                 poles_refurb = df_candidate_cv8[~df_candidate_cv8["pole"].astype(str).str.strip().isin(cv31_poles)]["adj_qty"].sum()
                 
+                print(f"  CV8 total: {poles_refurb}")
+                
                 # VALUE (if exists)
                 if "total" in df_proj.columns:
                     total_value = pd.to_numeric(df_proj["total"], errors="coerce").fillna(0).sum()
@@ -1231,9 +1244,24 @@ if filtered_df is not None and not filtered_df.empty:
 
             # Create DataFrame
             final_summary = pd.DataFrame(summary_rows)
+            
+            print("\n" + "="*50)
+            print("FINAL SUMMARY:")
+            print(final_summary)
+            print("="*50)
 
             # Sort by project
             final_summary = final_summary.sort_values("Project")
+
+            # Write to Excel
+            # --- Add Total Row ---
+            total_row = final_summary.select_dtypes(include='number').sum().to_dict()
+            total_row["Project"] = "Total"  # Label for the total row
+
+            # Append total row
+            final_summary = pd.concat([final_summary, pd.DataFrame([total_row])], ignore_index=True)
+            final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1)
+            ws_summary = writer.book["Summary"]
 
             # Write to Excel
             # --- Add Total Row ---
