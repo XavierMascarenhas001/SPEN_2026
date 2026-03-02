@@ -1122,24 +1122,24 @@ if filtered_df is not None and not filtered_df.empty:
 
             # --- Build summary per project ---
             summary_rows = []
+            # Ensure numeric first
+            export_df["Quantity_used"] = (pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0))
+            h_mask = export_df["item"].str.contains("'H' HV/EHV Pole",case=False,na=False)
+            h_recover_mask = export_df["item"].str.contains("Recover 'A' / 'H' pole, up",case=False,na=False)
+            export_df.loc[h_mask, "Quantity_used"] *= 2
+            export_df.loc[h_recover_mask, "Quantity_used"] *= 2
 
             for project, df_proj in export_df.groupby("project"):
                 df_proj = df_proj.copy()
 
                 # ERECT POLES
-                # Multiplier
-                h_mask = export_df["item"].str.contains("'H' HV/EHV Pole",case=False,na=False)
-                export_df.loc[h_mask, "Quantity_used"] *= 2
-                h_recover_mask = export_df["item"].str.contains("Recover 'A' / 'H' pole, up",case=False,na=False)
-                export_df.loc[h_recover_mask, "Quantity_used"] *= 2
-                # Use normalized items for category grouping
-                erect_all_norm = list(set([normalize_item(i) for i in CV7_erect.keys()]))
-                recover_all_norm = list(set([normalize_item(i) for i in CV7_recover.keys()]))
+                erect_all_norm = list(set(normalize_item(i) for i in CV7_erect.keys()))
+                recover_all_norm = list(set(normalize_item(i) for i in CV7_recover.keys()))
 
-                # Use adj_qty for calculations that need multiplier
-                erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["adj_qty"].sum()
-                recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["adj_qty"].sum()
+                erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["Quantity_used"].sum()
+                recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["Quantity_used"].sum()
                 erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
+
 
                 
                 # TRANSFORMERS
