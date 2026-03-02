@@ -1498,8 +1498,8 @@ if 'filtered_df' in locals() and not filtered_df.empty:
     # -------------------------------
     # --- Map Section ---
     # -------------------------------
-col_map, col_desc = st.columns([1])[0]
-with col_map:
+col_full = st.columns([1])[0]
+with col_full:
     st.header("🗺️ Regional Map View")
     folder_path = r"Maps"
     file_list = glob.glob(os.path.join(folder_path, "*.json"))
