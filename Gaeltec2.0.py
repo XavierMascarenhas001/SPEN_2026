@@ -1660,7 +1660,8 @@ with col_map:
                 sub_df['qsub'].astype(str).str.replace(" ", "").str.replace(",", ".", regex=False),
                 errors='coerce'
             )
-            bar_data = sub_df.groupby('mapped')['qsub_clean'].sum().reset_index()
+            sub_df["adj_value"] = sub_df["qsub_clean"] * sub_df["multiplier"]
+            bar_data = sub_df.groupby('mapped')['adj_value'].sum().reset_index()
             bar_data.columns = ['Mapped', 'Total']
         else:
             bar_data = sub_df['mapped'].value_counts().reset_index()
