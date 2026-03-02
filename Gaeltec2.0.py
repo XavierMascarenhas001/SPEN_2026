@@ -1106,9 +1106,9 @@ if filtered_df is not None and not filtered_df.empty:
 
 
             # Normalize key lists (USING YOUR NEW MAPPINGS)
-            erect_h_items_raw = [k for k in CV7_erect.keys() if "'H' HV/EHV Pole" in k]
+            erect_h_items_raw = [k for k in CV7_erect.keys() if "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole." in k]
             erect_h_items_norm = [normalize_item(k) for k in erect_h_items_raw]
-            recover_h_items_raw = [k for k in CV7_recover.keys() if "'A' / 'H' pole" in k]
+            recover_h_items_raw = [k for k in CV7_recover.keys() if "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions" in k]
             recover_h_items_norm = [normalize_item(k) for k in recover_h_items_raw]
             
             erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
