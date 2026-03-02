@@ -1131,19 +1131,40 @@ if filtered_df is not None and not filtered_df.empty:
                 # ERECT POLES
                 # Multiplier
                 df_proj["adj_qty"] = df_proj["Quantity_used"]
+                erect_items = df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_erect.keys()])]
+                for _, row in erect_items.iterrows():
+                    print(f"  Item: '{row['item']}'")
+                    print(f"    Norm: '{row['item_norm']}'")
+                    print(f"    Quantity_used: {row['Quantity_used']}")
+                    print(f"    Is H erect? {row['item_norm'] in erect_h_items_norm}")
+
+                # ERECT POLES
+                # Multiplier
+                df_proj["adj_qty"] = df_proj["Quantity_used"]
+                
+                # DEBUG: Check H erect mask creation
+                print(f"\nH erect items_norm list: {erect_h_items_norm}")
                 h_erect_mask = df_proj["item_norm"].isin(erect_h_items_norm)
+                print(f"H erect mask sum: {h_erect_mask.sum()}")
+                
                 if h_erect_mask.any():
                     print(f"  Found {h_erect_mask.sum()} H erect items")
+                    print("  These items will be doubled:")
+                    for idx in df_proj[h_erect_mask].index:
+                        print(f"    {df_proj.loc[idx, 'item']} (norm: {df_proj.loc[idx, 'item_norm']}) - Qty: {df_proj.loc[idx, 'Quantity_used']}")
+                    
                     print(f"  Before multiplier - sum: {df_proj.loc[h_erect_mask, 'Quantity_used'].sum()}")
                     df_proj.loc[h_erect_mask, "adj_qty"] = df_proj.loc[h_erect_mask, "Quantity_used"] * 2
                     print(f"  After multiplier - sum: {df_proj.loc[h_erect_mask, 'adj_qty'].sum()}")
-                
-                h_recover_mask = df_proj["item_norm"].isin(recover_h_items_norm)
-                if h_recover_mask.any():
-                    print(f"  Found {h_recover_mask.sum()} H recover items")
-                    print(f"  Before multiplier - sum: {df_proj.loc[h_recover_mask, 'Quantity_used'].sum()}")
-                    df_proj.loc[h_recover_mask, "adj_qty"] = df_proj.loc[h_recover_mask, "Quantity_used"] * 2
-                    print(f"  After multiplier - sum: {df_proj.loc[h_recover_mask, 'adj_qty'].sum()}")
+                else:
+                    print("  No H erect items found in this project")
+                    print("  Checking why:")
+                    for norm_item in erect_h_items_norm:
+                        matches = df_proj[df_proj["item_norm"] == norm_item]
+                        if not matches.empty:
+                            print(f"    Found '{norm_item}' but it's not matching? This shouldn't happen")
+                        else:
+                            print(f"    No matches for '{norm_item}'")
 
                 erect_all_norm = list(set([normalize_item(i) for i in CV7_erect.keys()]))
                 recover_all_norm = list(set([normalize_item(i) for i in CV7_recover.keys()]))
