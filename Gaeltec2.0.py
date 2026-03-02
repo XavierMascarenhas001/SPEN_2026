@@ -1632,14 +1632,6 @@ with col_map:
 
         mask = filtered_df['item'].astype(str).str.contains(pattern, case=False, na=False)
         sub_df = filtered_df[mask]
-        # Default multiplier
-        sub_df["multiplier"] = 1
-
-        # Double H erect items
-        sub_df.loc[sub_df["item"].isin(erect_h_items), "multiplier"] = 2
-
-        # Double H recover items
-        sub_df.loc[sub_df["item"].isin(recover_h_items), "multiplier"] = 2
 
         if sub_df.empty:
             st.info(f"No data found for {cat_name}")
