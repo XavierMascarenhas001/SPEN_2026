@@ -1145,7 +1145,6 @@ if filtered_df is not None and not filtered_df.empty:
 
                 df_proj["adj_qty"] = df_proj["Quantity_used"] * df_proj["multiplier"]
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["adj_qty"].sum()
-                df_proj["adj_qty"] = df_proj["Quantity_used"] * df_proj["multiplier"]
                 erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
 
                 # TRANSFORMERS
