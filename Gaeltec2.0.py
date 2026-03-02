@@ -1104,6 +1104,18 @@ if filtered_df is not None and not filtered_df.empty:
             export_df["Quantity_used"] = pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0)
             export_df["item_norm"] = export_df["item"].apply(normalize_item)
 
+            # DEBUG: Check what items are in your data
+            print("\n" + "="*50)
+            print("DEBUG: Items in export_df")
+            print("="*50)
+            print("Unique items in data:")
+            for item in sorted(export_df["item"].unique()):
+                print(f"  - '{item}'")
+            
+            print("\nUnique normalized items in data:")
+            for item in sorted(export_df["item_norm"].unique()):
+                print(f"  - '{item}'")
+
 
             # Normalize key lists (USING YOUR NEW MAPPINGS)
             erect_h_items_raw = [k for k in CV7_erect.keys() if "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole." in k]
