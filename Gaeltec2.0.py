@@ -1134,17 +1134,15 @@ if filtered_df is not None and not filtered_df.empty:
                 df_proj = df_proj.copy()
 
                 # ERECT POLES
-                erect_h_mask = df_proj["item_norm"].isin(erect_norm_H)
-                df_proj.loc[erect_h_mask, "Quantity_used"] *= 2
-                erect_poles = df_proj[df_proj["item_norm"].isin(erect_norm)]["Quantity_used"].sum()
+                df_proj["multiplier"] = 1
+                df_proj.loc[df_proj["item_norm"].isin(erect_norm_H), "multiplier"] = 2
+                df_proj.loc[df_proj["item_norm"].isin(recover_norm_H), "multiplier"] = 2
+                df_proj["adj_qty"] = df_proj["Quantity_used"] * df_proj["multiplier"]
+                erect_all_norm = erect_norm + erect_norm_H
+                recover_all_norm = recover_norm + recover_norm_H
+                erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["adj_qty"].sum()
+                recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["adj_qty"].sum()
                 erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
-
-
-                recover_h_mask = df_proj["item_norm"].isin(recover_norm_H)
-                df_proj.loc[recover_h_mask, "Quantity_used"] *= 2
-
-                # RECOVER POLES
-                recover_poles = df_proj[df_proj["item_norm"].isin(recover_norm)]["Quantity_used"].sum()
 
                 # TRANSFORMERS
                 tx_total = df_proj[df_proj["item_norm"].isin(tx_norm)]["Quantity_used"].sum()
@@ -1601,8 +1599,10 @@ with col_map:
 
     categories = [
         ("CV7_erect", CV7_erect, "Quantity"),
+        ("CV7_erect_H", CV7_erect_H, "Quantity"),
         ("CV7_erect_lv", CV7_erect_lv, "Quantity"),
         ("CV7_recover", CV7_recover, "Quantity"),
+        ("CV7_recover_H", CV7_recover_H, "Quantity"),
         ("CV7 Tx", CV7_Tx, "Quantity"),
         ("CV7 OHL CONDUCTOR", CV7_OHL_CONDUCTOR, "Length (Km)"),
         ("CV7 OHL CONDUCTOR LV", CV7_OHL_CONDUCTOR_LV, "Length (Km)"),
