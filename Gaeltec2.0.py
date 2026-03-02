@@ -1100,6 +1100,13 @@ if filtered_df is not None and not filtered_df.empty:
         # ---- Summary sheet ----
         if "Quantity_used" in export_df.columns:
 
+            # Ensure H poles are times 2
+            export_df["Quantity_used"] = (pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0))
+            h_mask = export_df["item"].str.contains("'H' HV/EHV Pole",case=False,na=False)
+            h_recover_mask = export_df["item"].str.contains("Recover 'A' / 'H' pole, up",case=False,na=False)
+            export_df.loc[h_mask, "Quantity_used"] *= 2
+            export_df.loc[h_recover_mask, "Quantity_used"] *= 2
+
             # Ensure numeric
             export_df["Quantity_used"] = pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0)
             export_df["item_norm"] = export_df["item"].apply(normalize_item)
@@ -1122,12 +1129,7 @@ if filtered_df is not None and not filtered_df.empty:
 
             # --- Build summary per project ---
             summary_rows = []
-            # Ensure numeric first
-            export_df["Quantity_used"] = (pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0))
-            h_mask = export_df["item"].str.contains("'H' HV/EHV Pole",case=False,na=False)
-            h_recover_mask = export_df["item"].str.contains("Recover 'A' / 'H' pole, up",case=False,na=False)
-            export_df.loc[h_mask, "Quantity_used"] *= 2
-            export_df.loc[h_recover_mask, "Quantity_used"] *= 2
+
 
             for project, df_proj in export_df.groupby("project"):
                 df_proj = df_proj.copy()
