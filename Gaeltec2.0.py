@@ -1128,11 +1128,10 @@ if filtered_df is not None and not filtered_df.empty:
 
                 # ERECT POLES
                 # Multiplier
-                df_proj["adj_qty"] = df_proj["Quantity_used"]
-                h_erect_mask = df_proj["item"].isin(erect_h_items_raw)
-                df_proj.loc[h_erect_mask, "adj_qty"] = df_proj.loc[h_erect_mask, "Quantity_used"] * 2
-                h_recover_mask = df_proj["item"].isin(recover_h_items_raw)
-                df_proj.loc[h_recover_mask, "adj_qty"] = df_proj.loc[h_recover_mask, "Quantity_used"] * 2
+                h_mask = export_df["item"].str.contains("'H' HV/EHV Pole",case=False,na=False)
+                export_df.loc[h_mask, "Quantity_used"] *= 2
+                h_recover_mask = export_df["item"].str.contains("Recover 'A' / 'H' pole, up",case=False,na=False)
+                export_df.loc[h_recover_mask, "Quantity_used"] *= 2
                 # Use normalized items for category grouping
                 erect_all_norm = list(set([normalize_item(i) for i in CV7_erect.keys()]))
                 recover_all_norm = list(set([normalize_item(i) for i in CV7_recover.keys()]))
