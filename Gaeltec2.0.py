@@ -1498,7 +1498,7 @@ if 'filtered_df' in locals() and not filtered_df.empty:
     # -------------------------------
     # --- Map Section ---
     # -------------------------------
-col_map, col_desc = st.columns([5, 1])
+col_map, col_desc = st.columns([1])[0]
 with col_map:
     st.header("🗺️ Regional Map View")
     folder_path = r"Maps"
