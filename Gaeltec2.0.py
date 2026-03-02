@@ -1141,6 +1141,7 @@ if filtered_df is not None and not filtered_df.empty:
                 recover_all_norm = list(set([normalize_item(i) for i in CV7_recover.keys()]))
                 erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["adj_qty"].sum()
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["adj_qty"].sum()
+                erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
 
                 # TRANSFORMERS
                 tx_total = df_proj[df_proj["item_norm"].isin(tx_norm)]["Quantity_used"].sum()
