@@ -1116,10 +1116,10 @@ if filtered_df is not None and not filtered_df.empty:
 
             # Normalize key lists (USING YOUR NEW MAPPINGS)
             erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
-            erect_norm_H = [normalize_item(i) for i in CV7_erect_H.keys()]
+            erect_h_items = [normalize_item(k) for k, v in CV7_erect.items() if "'H' HV/EHV Pole" in k]
             erect_norm_lv = [normalize_item(i) for i in CV7_erect_lv.keys()]
             recover_norm = [normalize_item(i) for i in CV7_recover.keys()]
-            recover_norm_H = [normalize_item(i) for i in CV7_recover_H.keys()]
+            recover_h_items = [normalize_item(k) for k, v in CV7_recover.items() if "'A' / 'H' pole" in k]
             tx_norm = [normalize_item(i) for i in CV7_Tx.keys()]
             conductor_hv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR.keys()]
             conductor_lv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR_LV.keys()]
@@ -1139,13 +1139,15 @@ if filtered_df is not None and not filtered_df.empty:
                 # Multiplier
                 df_proj["multiplier"] = 1
                 # ONLY double the H erect item
-                df_proj.loc[df_proj["item_norm"].isin(erect_norm_H), "multiplier"] = 2
+                df_proj.loc[df_proj["item_norm"].isin(erect_h_items), "multiplier"] = 2
                 # If you also want recover H doubled:
-                df_proj.loc[df_proj["item_norm"].isin(recover_norm_H), "multiplier"] = 2
+                df_proj.loc[df_proj["item_norm"].isin(recover_h_items), "multiplier"] = 2
 
                 df_proj["adj_qty"] = df_proj["Quantity_used"] * df_proj["multiplier"]
+                erect_all_norm = list(set([normalize_item(i) for i in CV7_erect.keys()]))
+                recover_all_norm = list(set([normalize_item(i) for i in CV7_recover.keys()]))
+                erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["adj_qty"].sum()
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["adj_qty"].sum()
-                erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
 
                 # TRANSFORMERS
                 tx_total = df_proj[df_proj["item_norm"].isin(tx_norm)]["Quantity_used"].sum()
