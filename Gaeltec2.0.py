@@ -1103,16 +1103,14 @@ if filtered_df is not None and not filtered_df.empty:
             # Ensure numeric
             export_df["Quantity_used"] = pd.to_numeric(export_df["Quantity_used"], errors="coerce").fillna(0)
 
-            # Normalize items
-            export_df["item_norm"] = export_df["item"].apply(normalize_item)
-
 
             # Normalize key lists (USING YOUR NEW MAPPINGS)
+            erect_h_items_raw = [k for k in CV7_erect.keys() if "'H' HV/EHV Pole" in k]
+            recover_h_items_raw = [k for k in CV7_recover.keys() if "'A' / 'H' pole" in k]
+            export_df["item_norm"] = export_df["item"].apply(normalize_item)
             erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
-            erect_h_items = [normalize_item(k) for k, v in CV7_erect.items() if "'H' HV/EHV Pole" in k]
             erect_norm_lv = [normalize_item(i) for i in CV7_erect_lv.keys()]
             recover_norm = [normalize_item(i) for i in CV7_recover.keys()]
-            recover_h_items = [normalize_item(k) for k, v in CV7_recover.items() if "'A' / 'H' pole" in k]
             tx_norm = [normalize_item(i) for i in CV7_Tx.keys()]
             conductor_hv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR.keys()]
             conductor_lv_norm = [normalize_item(i) for i in CV7_OHL_CONDUCTOR_LV.keys()]
@@ -1131,11 +1129,11 @@ if filtered_df is not None and not filtered_df.empty:
                 # ERECT POLES
                 # Multiplier
                 df_proj["adj_qty"] = df_proj["Quantity_used"]
-                h_erect_mask = df_proj["item_norm"].isin(erect_h_items)
+                h_erect_mask = df_proj["item"].isin(erect_h_items_raw)
                 # ONLY double the H erect item
                 df_proj.loc[h_erect_mask, "adj_qty"] = df_proj.loc[h_erect_mask, "Quantity_used"] * 2
                 # If you also want recover H doubled:
-                h_recover_mask = df_proj["item_norm"].isin(recover_h_items)
+                h_recover_mask = df_proj["item"].isin(recover_h_items_raw)
                 df_proj.loc[h_recover_mask, "adj_qty"] = df_proj.loc[h_recover_mask, "Quantity_used"] * 2
 
                 erect_all_norm = list(set([normalize_item(i) for i in CV7_erect.keys()]))
