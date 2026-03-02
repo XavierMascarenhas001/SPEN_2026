@@ -1505,16 +1505,16 @@ with col_top_right:
     # -----------------------------
 
 # ---- Streamlit download button ----
-    if 'filtered_df' in locals() and not filtered_df.empty:
-        excel_file = generate_excel_styled_multilevel(
-            filtered_df,
-            poles_df if 'poles_df' in locals() else None)
-        st.download_button(
-            label="📥 High level planning & Poles Excel",
-            data=excel_file,
-            file_name=f"High level planning_{date_range_str}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+if 'filtered_df' in locals() and not filtered_df.empty:
+    excel_file = generate_excel_styled_multilevel(
+        filtered_df,
+        poles_df if 'poles_df' in locals() else None)
+    st.download_button(
+        label="📥 High level planning & Poles Excel",
+        data=excel_file,
+        file_name=f"High level planning_{date_range_str}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
         
     # -------------------------------
     # --- Map Section ---
@@ -1531,7 +1531,7 @@ with col_map:
         gdf_list = [gpd.read_file(file) for file in file_list]
         combined_gdf = gpd.GeoDataFrame(pd.concat(gdf_list, ignore_index=True), crs=gdf_list[0].crs)
 
-        if "location_map" in filtered_df.columns:
+        if "region" in filtered_df.columns:
             active_regions = filtered_df["region"].dropna().unique().tolist()
             wards_to_select = []
             for region in active_regions:
