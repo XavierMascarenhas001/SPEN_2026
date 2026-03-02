@@ -1406,10 +1406,13 @@ else:
 
     
 # Display Project and completion
-col_top_left, col_top_right = st.columns([1, 1])
+col_top_left, col_top_right = st.columns([3, 1])
 # Project Completion
 with col_top_left:
-    st.markdown("<h3 style='text-align:center; color:white;'>Projects Distribution</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align:center; color:white;'>Projects Distribution</h3>",unsafe_allow_html=True)
+
+    if not filtered_df.empty and 'project' in filtered_df.columns:
+        st.plotly_chart(fig, use_container_width=True)
     # --- Top-right Pie Chart: Projects Distribution ---
     try:
         if 'filtered_df' in locals() and not filtered_df.empty and 'project' in filtered_df.columns:
@@ -1461,41 +1464,38 @@ with col_top_left:
 # Works total
 with col_top_right:
     # Left side: Projects & Segments Overview and Works Complete pie chart
-    col_left_top, col_left_bottom = st.columns([1, 1])
-        
-    with col_left_top:
-        st.markdown("<h3 style='color:white;'>Projects & Circuits Overview</h3>", unsafe_allow_html=True)
-        required_cols = ['project', 'segmentcode']
-        existing_cols = [c for c in required_cols if c in filtered_df.columns]
+    st.markdown("<h3 style='color:white;'>Projects & Circuits Overview</h3>", unsafe_allow_html=True)
+    required_cols = ['project', 'segmentcode']
+    existing_cols = [c for c in required_cols if c in filtered_df.columns]
 
-        if 'project' in existing_cols:
-            projects = filtered_df['project'].dropna().unique()
-            if len(projects) == 0:
-                st.info("No projects found for the selected filters.")
-            else:
-                for proj in sorted(projects):
-                    cols_to_use = [c for c in ['segmentcode'] if c in filtered_df.columns]
-                    if not cols_to_use:
-                        segments = pd.DataFrame()
-                    else:
-                        proj_df = filtered_df[filtered_df['project'] == proj][cols_to_use]
-                        segments = proj_df.dropna().drop_duplicates()
-                    
-                    # Use expander to make segment list scrollable
-                    with st.expander(f"Project: {proj} ({len(segments)} circuits)"):
-                        if not segments.empty:
-                            display_text = segments.astype(str).agg(" | ".join, axis=1)
-                            # Scrollable container for segments
-                            st.markdown(
-                                "<div style='max-height:150px; overflow-y:auto; padding:5px; border:1px solid #444;'>"
-                                + "<br>".join(segments['segmentcode'].astype(str))
-                                + "</div>",
-                                unsafe_allow_html=True
-                            )
-                        else:
-                            st.write("No circuit codes for this project.")
+    if 'project' in existing_cols:
+        projects = filtered_df['project'].dropna().unique()
+        if len(projects) == 0:
+            st.info("No projects found for the selected filters.")
         else:
-            st.info("Project or Circuit not found in the data.")
+            for proj in sorted(projects):
+                cols_to_use = [c for c in ['segmentcode'] if c in filtered_df.columns]
+                if not cols_to_use:
+                    segments = pd.DataFrame()
+                else:
+                    proj_df = filtered_df[filtered_df['project'] == proj][cols_to_use]
+                    segments = proj_df.dropna().drop_duplicates()
+                    
+                # Use expander to make segment list scrollable
+                with st.expander(f"Project: {proj} ({len(segments)} circuits)"):
+                    if not segments.empty:
+                        display_text = segments.astype(str).agg(" | ".join, axis=1)
+                        # Scrollable container for segments
+                        st.markdown(
+                            "<div style='max-height:150px; overflow-y:auto; padding:5px; border:1px solid #444;'>"
+                            + "<br>".join(segments['segmentcode'].astype(str))
+                            + "</div>",
+                            unsafe_allow_html=True
+                        )
+                    else:
+                        st.write("No circuit codes for this project.")
+    else:
+        st.info("Project or Circuit not found in the data.")
 
     # -----------------------------
     # Streamlit download button
