@@ -1105,10 +1105,8 @@ if filtered_df is not None and not filtered_df.empty:
             export_df["item_norm"] = export_df["item"].apply(normalize_item)
 
             # Normalize key lists (USING YOUR NEW MAPPINGS)
-            erect_h_items_raw = [k for k in CV7_erect.keys() if "Erect Section Structure 'H' HV/EHV Pole, up to and including 12 metre pole." in k]
-            erect_h_items_norm = [normalize_item(k) for k in erect_h_items_raw]
-            recover_h_items_raw = [k for k in CV7_recover.keys() if "Recover 'A' / 'H' pole, up to and including 15 metres in height, and reinstate, all ground conditions" in k]
-            recover_h_items_norm = [normalize_item(k) for k in recover_h_items_raw]
+            erect_h_items_raw = [k for k in CV7_erect.keys() if "'H' HV/EHV Pole" in k]
+            recover_h_items_raw = [k for k in CV7_recover.keys() if "'A' / 'H' pole" in k]
             
             erect_norm = [normalize_item(i) for i in CV7_erect.keys()]
             erect_norm_lv = [normalize_item(i) for i in CV7_erect_lv.keys()]
@@ -1131,51 +1129,20 @@ if filtered_df is not None and not filtered_df.empty:
                 # ERECT POLES
                 # Multiplier
                 df_proj["adj_qty"] = df_proj["Quantity_used"]
-                erect_items = df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_erect.keys()])]
-                for _, row in erect_items.iterrows():
-                    print(f"  Item: '{row['item']}'")
-                    print(f"    Norm: '{row['item_norm']}'")
-                    print(f"    Quantity_used: {row['Quantity_used']}")
-                    print(f"    Is H erect? {row['item_norm'] in erect_h_items_norm}")
-
-                # ERECT POLES
-                # Multiplier
-                df_proj["adj_qty"] = df_proj["Quantity_used"]
-                
-                # DEBUG: Check H erect mask creation
-                print(f"\nH erect items_norm list: {erect_h_items_norm}")
-                h_erect_mask = df_proj["item_norm"].isin(erect_h_items_norm)
-                print(f"H erect mask sum: {h_erect_mask.sum()}")
-                
-                if h_erect_mask.any():
-                    print(f"  Found {h_erect_mask.sum()} H erect items")
-                    print("  These items will be doubled:")
-                    for idx in df_proj[h_erect_mask].index:
-                        print(f"    {df_proj.loc[idx, 'item']} (norm: {df_proj.loc[idx, 'item_norm']}) - Qty: {df_proj.loc[idx, 'Quantity_used']}")
-                    
-                    print(f"  Before multiplier - sum: {df_proj.loc[h_erect_mask, 'Quantity_used'].sum()}")
-                    df_proj.loc[h_erect_mask, "adj_qty"] = df_proj.loc[h_erect_mask, "Quantity_used"] * 2
-                    print(f"  After multiplier - sum: {df_proj.loc[h_erect_mask, 'adj_qty'].sum()}")
-                else:
-                    print("  No H erect items found in this project")
-                    print("  Checking why:")
-                    for norm_item in erect_h_items_norm:
-                        matches = df_proj[df_proj["item_norm"] == norm_item]
-                        if not matches.empty:
-                            print(f"    Found '{norm_item}' but it's not matching? This shouldn't happen")
-                        else:
-                            print(f"    No matches for '{norm_item}'")
-
+                h_erect_mask = df_proj["item"].isin(erect_h_items_raw)
+                df_proj.loc[h_erect_mask, "adj_qty"] = df_proj.loc[h_erect_mask, "Quantity_used"] * 2
+                h_recover_mask = df_proj["item"].isin(recover_h_items_raw)
+                df_proj.loc[h_recover_mask, "adj_qty"] = df_proj.loc[h_recover_mask, "Quantity_used"] * 2
+                # Use normalized items for category grouping
                 erect_all_norm = list(set([normalize_item(i) for i in CV7_erect.keys()]))
                 recover_all_norm = list(set([normalize_item(i) for i in CV7_recover.keys()]))
-                
+
+                # Use adj_qty for calculations that need multiplier
                 erect_poles = df_proj[df_proj["item_norm"].isin(erect_all_norm)]["adj_qty"].sum()
                 recover_poles = df_proj[df_proj["item_norm"].isin(recover_all_norm)]["adj_qty"].sum()
-                
-                print(f"  Final totals - erect: {erect_poles}, recover: {recover_poles}")
-                
                 erect_poles_lv = df_proj[df_proj["item_norm"].isin(erect_norm_lv)]["Quantity_used"].sum()
 
+                
                 # TRANSFORMERS
                 tx_total = df_proj[df_proj["item_norm"].isin(tx_norm)]["Quantity_used"].sum()
 
