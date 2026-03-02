@@ -1614,9 +1614,10 @@ with col_map:
         name = re.sub(r'[:\\/*?\[\]\n\r]', '_', name)
         name = re.sub(r'[^\x00-\x7F]', '_', name)  # remove Unicode like m²
         return name[:31]
+
+    erect_h_items = [k for k in CV7_erect.keys() if "'H' HV/EHV Pole" in k]
+    recover_h_items = [k for k in CV7_recover.keys() if "'A' / 'H' pole" in k]
         
-    erect_h_items = set(CV7_erect_H.keys())
-    recover_h_items = set(CV7_recover_H.keys())
 
     for cat_name, keys, y_label in categories:
 
@@ -1624,6 +1625,30 @@ with col_map:
         if 'item' not in filtered_df.columns or 'mapped' not in filtered_df.columns:
             st.warning("Missing required columns: item / mapped")
             continue
+
+        # Default multiplier
+        sub_df["multiplier"] = 1
+
+        # Double H erect items
+        sub_df.loc[sub_df["item"].isin(erect_h_items), "multiplier"] = 2
+
+        # Double H recover items
+        sub_df.loc[sub_df["item"].isin(recover_h_items), "multiplier"] = 2
+
+        # Apply multiplier to your quantity column
+        if 'qsub' in sub_df.columns:
+            sub_df['qsub_clean'] = pd.to_numeric(
+                sub_df['qsub'].astype(str).str.replace(" ", "").str.replace(",", ".", regex=False),
+                errors='coerce'
+            )
+            sub_df["adj_value"] = sub_df["qsub_clean"] * sub_df["multiplier"]
+            bar_data = sub_df.groupby('mapped')['adj_value'].sum().reset_index()
+            bar_data.columns = ['Mapped', 'Total']
+        else:
+            # Use multiplier for counts
+            sub_df["adj_value"] = sub_df["multiplier"]
+            bar_data = sub_df.groupby('mapped')['adj_value'].sum().reset_index()
+            bar_data.columns = ['Mapped', 'Total']
             
         # Build regex pattern for this category’s keys
         pattern = '|'.join([re.escape(k) for k in keys.keys()])
