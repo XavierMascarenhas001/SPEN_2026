@@ -1467,10 +1467,14 @@ with col_top_right:
         else:
             for proj in sorted(projects):
                 proj_df = filtered_df[filtered_df['project'] == proj]
-                segments = proj_df['segmentcode'].dropna().drop_duplicates()
+                segments = proj_df[['segmentcode', 'sourcefile']].dropna(subset=['segmentcode']).drop_duplicates()
 
                 with st.expander(f"Project: {proj} ({len(segments)} circuits)"):
                     if not segments.empty:
+                        for _, row in segments.iterrows():
+                            seg = row["segmentcode"]
+                            src = row["sourcefile"] if "sourcefile" in segments.columns else ""
+                            display_text.append(f"{seg}  |  {src}")
                         st.markdown(
                             "<div style='max-height:150px; overflow-y:auto; padding:5px; border:1px solid #444;'>"
                             + "<br>".join(segments.astype(str))
