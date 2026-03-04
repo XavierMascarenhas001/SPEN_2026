@@ -381,10 +381,10 @@ def generate_excel_styled_multilevel(filtered_df, poles_df=None):
     ws.title = "Daily Revenue"
 
     # ---- Sheet 1: Daily Revenue ----
-    if {'shire', 'project','region','segmentdesc', 'segmentcode', 'projectmanager', 'datetouse_dt','done', 'total'}.issubset(filtered_df.columns):
+    if {'shire', 'project','region','segmentdesc', 'segmentcode', 'projectmanager', 'datetouse_dt','done', 'total','sourcefile'}.issubset(filtered_df.columns):
         daily_df = (
             filtered_df
-            .groupby(['datetouse_dt','shire','project','region','segmentdesc','segmentcode','projectmanager'], as_index=False)
+            .groupby(['datetouse_dt','shire','project','region','segmentdesc','segmentcode','projectmanager','sourcefile'], as_index=False)
             .agg({'total':'sum'})
         )
         daily_df.rename(columns={
@@ -393,7 +393,8 @@ def generate_excel_styled_multilevel(filtered_df, poles_df=None):
             'region':'location',
             'segmentdesc':'Detail',
             'segmentcode':'Segment',
-            'projectmanager':'Project Manager'
+            'projectmanager':'Project Manager',
+            'sourcefile':'Control file'
         }, inplace=True)
 
         # Write header in ROW 2 (row 1 reserved for images)
