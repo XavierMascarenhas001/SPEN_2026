@@ -1471,6 +1471,7 @@ with col_top_right:
 
                 with st.expander(f"Project: {proj} ({len(segments)} circuits)"):
                     if not segments.empty:
+                        display_text = []
                         for _, row in segments.iterrows():
                             seg = row["segmentcode"]
                             src = row["sourcefile"] if "sourcefile" in segments.columns else ""
