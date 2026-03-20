@@ -1116,31 +1116,66 @@ for cat_name, keys, y_label in categories:
 # -------------------------------
 if filtered_df is not None and not filtered_df.empty:
     buffer_agg = BytesIO()
+
     with pd.ExcelWriter(buffer_agg, engine="openpyxl") as writer:
 
+        # ---- Prepare Data ----
         export_df = filtered_df.rename(columns=column_rename_map).copy()
-        export_df["Quantity_used"] = pd.to_numeric(export_df.get("Quantity_used", 0), errors="coerce").fillna(0)
+
+        export_df["Quantity_used"] = pd.to_numeric(
+            export_df.get("Quantity_used", 0), errors="coerce"
+        ).fillna(0)
+
         if "qcvi" in export_df.columns:
             export_df["qcvi"] = pd.to_numeric(
                 export_df["qcvi"], errors="coerce"
             ).fillna(0)
+
         export_df["item_norm"] = export_df["item"].apply(normalize_item)
 
         # Multiply H-poles
         h_mask = export_df["item"].str.contains("'H' HV/EHV Pole", case=False, na=False)
-        h_recover_mask = export_df["item"].str.contains("Recover 'A' / 'H' pole, up", case=False, na=False)
+        h_recover_mask = export_df["item"].str.contains(
+            "Recover 'A' / 'H' pole, up", case=False, na=False
+        )
         export_df.loc[h_mask | h_recover_mask, "Quantity_used"] *= 2
 
+        # -----------------------
         # ---- Output Sheet ----
-        export_df = export_df.fillna("")
-        export_df.to_excel(writer, sheet_name="Output", index=False, startrow=1, na_rep="")
-        ws_output = writer.sheets["Output"]
+        # -----------------------
+        export_df_to_write = export_df.copy()
 
+        # Replace NaNs ONLY for display
+        export_df_to_write = export_df_to_write.where(
+            pd.notnull(export_df_to_write), ""
+        )
+
+        # Blank QCVI zeros
+        if "qcvi" in export_df_to_write.columns:
+            export_df_to_write.loc[
+                export_df_to_write["qcvi"] == 0, "qcvi"
+            ] = ""
+
+        export_df_to_write.to_excel(
+            writer,
+            sheet_name="Output",
+            index=False,
+            startrow=1,
+            na_rep=""
+        )
+
+        # -----------------------
         # ---- Summary Sheet ----
+        # -----------------------
         summary_rows = []
+
         for project, df_proj in export_df.groupby("project"):
             df_proj = df_proj.copy()
-            df_proj["qcvi"] = pd.to_numeric(df_proj.get("qcvi", 0), errors='coerce').fillna(0)
+
+            df_proj["qcvi"] = pd.to_numeric(
+                df_proj.get("qcvi", 0), errors="coerce"
+            ).fillna(0)
+
             summary_rows.append({
                 "Project": project,
                 "CV7_erect": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_erect.keys()])]["Quantity_used"].sum(),
@@ -1156,17 +1191,36 @@ if filtered_df is not None and not filtered_df.empty:
                 "Total Value (£)": df_proj.get("total", pd.Series([0])).sum(),
                 "QCVI": df_proj["qcvi"].sum()
             })
+
         final_summary = pd.DataFrame(summary_rows).sort_values("Project")
+
         if not final_summary.empty:
             total_row = final_summary.select_dtypes(include="number").sum().to_dict()
             total_row["Project"] = "Total"
             total_row["QCVI"] = final_summary["QCVI"].sum()
-            final_summary = pd.concat([final_summary, pd.DataFrame([total_row])], ignore_index=True)
-        final_summary.pop("QCVI")
-        final_summary = final_summary.fillna("")
-        final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1, na_rep="")
+            final_summary = pd.concat(
+                [final_summary, pd.DataFrame([total_row])],
+                ignore_index=True
+            )
 
+        final_summary.pop("QCVI")
+
+        final_summary_to_write = final_summary.copy()
+        final_summary_to_write = final_summary_to_write.where(
+            pd.notnull(final_summary_to_write), ""
+        )
+
+        final_summary_to_write.to_excel(
+            writer,
+            sheet_name="Summary",
+            index=False,
+            startrow=1,
+            na_rep=""
+        )
+
+        # -----------------------
         # ---- Breakdown Sheets ----
+        # -----------------------
         breakdown_columns = {
             "CV7_erect": CV7_erect.keys(),
             "CV7_erect_lv": CV7_erect_lv.keys(),
@@ -1181,55 +1235,118 @@ if filtered_df is not None and not filtered_df.empty:
         }
 
         for col_name, keys in breakdown_columns.items():
-            df_breakdown = export_df[export_df["item_norm"].isin([normalize_item(k) for k in keys])].copy()
-            cols_to_include_sheet = ["item","comment","Quantity_used","qcvi","material_code","pole","datetouse_dt","done","District","project","Project Manager","location_map","Circuit","Segment","sourcefile"]
-            cols_to_include_sheet = [c for c in cols_to_include_sheet if c in df_breakdown.columns]
-            df_breakdown = df_breakdown[cols_to_include_sheet]
-            df_breakdown = df_breakdown.fillna("")
-            df_breakdown.to_excel(writer, sheet_name=col_name[:31], index=False, startrow=1, na_rep="")
 
-        # ---- Apply formatting + images ----
+            df_breakdown = export_df[
+                export_df["item_norm"].isin([normalize_item(k) for k in keys])
+            ].copy()
+
+            cols_to_include_sheet = [
+                "item","comment","Quantity_used","qcvi","material_code","pole",
+                "datetouse_dt","done","District","project","Project Manager",
+                "location_map","Circuit","Segment","sourcefile"
+            ]
+
+            cols_to_include_sheet = [
+                c for c in cols_to_include_sheet if c in df_breakdown.columns
+            ]
+
+            df_breakdown = df_breakdown[cols_to_include_sheet]
+
+            df_breakdown_to_write = df_breakdown.copy()
+
+            if "qcvi" in df_breakdown_to_write.columns:
+                df_breakdown_to_write["qcvi"] = pd.to_numeric(
+                    df_breakdown_to_write["qcvi"], errors="coerce"
+                )
+
+                # Blank zeros
+                df_breakdown_to_write.loc[
+                    df_breakdown_to_write["qcvi"] == 0, "qcvi"
+                ] = ""
+
+            df_breakdown_to_write = df_breakdown_to_write.where(
+                pd.notnull(df_breakdown_to_write), ""
+            )
+
+            df_breakdown_to_write.to_excel(
+                writer,
+                sheet_name=col_name[:31],
+                index=False,
+                startrow=1,
+                na_rep=""
+            )
+
+        # -----------------------
+        # ---- Formatting + Images ----
+        # -----------------------
         IMG_HEIGHT = 120
         IMG_WIDTH_SMALL = 120
         IMG_WIDTH_LARGE = IMG_WIDTH_SMALL * 3
+
         header_font = Font(bold=True, size=16)
         header_fill = PatternFill(start_color="00CCFF", end_color="00CCFF", fill_type="solid")
+
         thin_side = Side(style="thin")
         medium_side = Side(style="medium")
         thick_side = Side(style="thick")
+
         light_grey_fill = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
         white_fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
-        red_font = Font(color="FF0000")
-        green_font = Font(color="00AA00")
 
         for ws in writer.sheets.values():
             ws.row_dimensions[1].height = 90
-            img1 = XLImage("Images/GaeltecImage.png"); img1.width=IMG_WIDTH_SMALL; img1.height=IMG_HEIGHT; img1.anchor="B1"
-            img2 = XLImage("Images/SPEN.png"); img2.width=IMG_WIDTH_LARGE; img2.height=IMG_HEIGHT; img2.anchor="A1"
-            ws.add_image(img1); ws.add_image(img2)
+
+            img1 = XLImage("Images/GaeltecImage.png")
+            img1.width = IMG_WIDTH_SMALL
+            img1.height = IMG_HEIGHT
+            img1.anchor = "B1"
+
+            img2 = XLImage("Images/SPEN.png")
+            img2.width = IMG_WIDTH_LARGE
+            img2.height = IMG_HEIGHT
+            img2.anchor = "A1"
+
+            ws.add_image(img1)
+            ws.add_image(img2)
 
             max_col = ws.max_column
+
             for col_idx, cell in enumerate(ws[2], start=1):
                 cell.font = header_font
                 cell.fill = header_fill
-                ws.column_dimensions[get_column_letter(col_idx)].width = 60 if col_idx == 1 else 20
-                cell.border = Border(left=thick_side if col_idx==1 else medium_side,
-                                     right=thick_side if col_idx==max_col else medium_side,
-                                     top=thick_side, bottom=thick_side)
-            # Format rows
+
+                ws.column_dimensions[get_column_letter(col_idx)].width = (
+                    60 if col_idx == 1 else 20
+                )
+
+                cell.border = Border(
+                    left=thick_side if col_idx == 1 else medium_side,
+                    right=thick_side if col_idx == max_col else medium_side,
+                    top=thick_side,
+                    bottom=thick_side
+                )
+
             for row_idx in range(3, ws.max_row + 1):
                 fill = light_grey_fill if row_idx % 2 == 1 else white_fill
-                for col_idx in range(1, ws.max_column+1):
+
+                for col_idx in range(1, ws.max_column + 1):
                     cell = ws.cell(row=row_idx, column=col_idx)
                     cell.fill = fill
-                    cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
+                    cell.border = Border(
+                        left=thin_side,
+                        right=thin_side,
+                        top=thin_side,
+                        bottom=thin_side
+                    )
 
     buffer_agg.seek(0)
+
     st.download_button(
         label="📥 Download Excel (Output Details)",
         data=buffer_agg,
         file_name="Gaeltec_Output.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
 else:
     st.info("No data available for Excel export.")
