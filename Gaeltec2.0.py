@@ -1033,8 +1033,8 @@ for cat_name, keys, y_label in categories:
         continue
 
     # Clean numeric columns
-    sub_df['qvci_clean'] = pd.to_numeric(sub_df.get('qvci', 0), errors='coerce').fillna(0)
-    sub_df['qsub_clean'] = pd.to_numeric(sub_df.get('qsub', 0), errors='coerce').fillna(0)
+    sub_df['qvci_clean'] = pd.to_numeric(sub_df['qvci'] if 'qvci' in sub_df.columns else pd.Series(0, index=sub_df.index), errors='coerce').fillna(0)
+    sub_df['qsub_clean'] = pd.to_numeric(sub_df['qsub'] if 'qsub' in sub_df.columns else pd.Series(0, index=sub_df.index), errors='coerce').fillna(0)
     sub_df["multiplier"] = 1
     sub_df.loc[sub_df["item"].isin(erect_h_items), "multiplier"] = 2
     sub_df.loc[sub_df["item"].isin(recover_h_items), "multiplier"] = 2
