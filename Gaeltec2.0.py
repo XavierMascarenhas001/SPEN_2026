@@ -1016,11 +1016,16 @@ if not prepared_df.empty:
         h_recover_mask = prepared_df["item"].str.contains("Recover 'A' / 'H' pole", case=False, na=False)
         prepared_df.loc[h_mask | h_recover_mask, "Quantity_used"] *= 2
 
-excel_file = build_full_excel(prepared_df)
+if not prepared_df.empty:
+    buffer_agg = BytesIO()
+    with pd.ExcelWriter(buffer_agg, engine='openpyxl') as writer:
+        # Output the full prepared_df
+        prepared_df.to_excel(writer, sheet_name='Output', index=False)
 
-if excel_file:
+    buffer_agg.seek(0)
     st.download_button(
         "📥 Download Excel (Output Details)",
-        excel_file,
-        file_name="Gaeltec_Output.xlsx"
+        buffer_agg,
+        file_name="Gaeltec_Output.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
