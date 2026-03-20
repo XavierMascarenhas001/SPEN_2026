@@ -1292,6 +1292,9 @@ if filtered_df is not None and not filtered_df.empty:
 
         light_grey_fill = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
         white_fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+        red_font = Font(color="FF0000")
+        green_font = Font(color="00AA00")
+        black_font = Font(color="000000")
 
         for ws in writer.sheets.values():
             ws.row_dimensions[1].height = 90
@@ -1326,6 +1329,14 @@ if filtered_df is not None and not filtered_df.empty:
                     bottom=thick_side
                 )
 
+            # Identify QCVI column
+            qcvi_col_idx = None
+            for col_idx, cell in enumerate(ws[2], start=1):
+                if cell.value == "qcvi":
+                    qcvi_col_idx = col_idx
+                    break
+
+                    
             for row_idx in range(3, ws.max_row + 1):
                 fill = light_grey_fill if row_idx % 2 == 1 else white_fill
 
@@ -1338,6 +1349,18 @@ if filtered_df is not None and not filtered_df.empty:
                         top=thin_side,
                         bottom=thin_side
                     )
+
+                    if qcvi_col_idx and col_idx == qcvi_col_idx and cell.value not in ("", None):
+                        try:
+                            val = float(cell.value)
+                            if val > 0:
+                                cell.font = green_font
+                            elif val < 0:
+                                cell.font = red_font
+                            else:
+                                cell.font = black_font
+                        except ValueError:
+                            cell.font = black_font
 
     buffer_agg.seek(0)
 
