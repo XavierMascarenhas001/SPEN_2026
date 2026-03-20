@@ -1120,6 +1120,10 @@ if filtered_df is not None and not filtered_df.empty:
 
         export_df = filtered_df.rename(columns=column_rename_map).copy()
         export_df["Quantity_used"] = pd.to_numeric(export_df.get("Quantity_used", 0), errors="coerce").fillna(0)
+        if "qcvi" in export_df.columns:
+            export_df["qcvi"] = pd.to_numeric(
+                export_df["qcvi"], errors="coerce"
+            ).fillna(0)
         export_df["item_norm"] = export_df["item"].apply(normalize_item)
 
         # Multiply H-poles
@@ -1128,6 +1132,7 @@ if filtered_df is not None and not filtered_df.empty:
         export_df.loc[h_mask | h_recover_mask, "Quantity_used"] *= 2
 
         # ---- Output Sheet ----
+        export_df = export_df.fillna("")
         export_df.to_excel(writer, sheet_name="Output", index=False, startrow=1, na_rep="")
         ws_output = writer.sheets["Output"]
 
@@ -1157,7 +1162,8 @@ if filtered_df is not None and not filtered_df.empty:
             total_row["Project"] = "Total"
             total_row["QCVI"] = final_summary["QCVI"].sum()
             final_summary = pd.concat([final_summary, pd.DataFrame([total_row])], ignore_index=True)
-        qcvi_series = final_summary.pop("QCVI")  # remove QCVI column
+        final_summary.pop("QCVI")
+        final_summary = final_summary.fillna("")
         final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1, na_rep="")
 
         # ---- Breakdown Sheets ----
@@ -1179,6 +1185,7 @@ if filtered_df is not None and not filtered_df.empty:
             cols_to_include_sheet = ["item","comment","Quantity_used","qcvi","material_code","pole","datetouse_dt","done","District","project","Project Manager","location_map","Circuit","Segment","sourcefile"]
             cols_to_include_sheet = [c for c in cols_to_include_sheet if c in df_breakdown.columns]
             df_breakdown = df_breakdown[cols_to_include_sheet]
+            df_breakdown = df_breakdown.fillna("")
             df_breakdown.to_excel(writer, sheet_name=col_name[:31], index=False, startrow=1, na_rep="")
 
         # ---- Apply formatting + images ----
