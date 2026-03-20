@@ -992,14 +992,29 @@ else:
 prepared_df = filtered_df.copy() if filtered_df is not None else pd.DataFrame()
 
 if not prepared_df.empty:
-    prepared_df["Quantity_used"] = pd.to_numeric(prepared_df.get("Quantity_used", 0), errors="coerce").fillna(0)
-    prepared_df["qcvi"] = pd.to_numeric(prepared_df.get("qcvi", 0), errors="coerce").fillna(0)
-    prepared_df["item_norm"] = prepared_df["item"].apply(normalize_item)
+    # Ensure Quantity_used exists
+    if "Quantity_used" in prepared_df.columns:
+        prepared_df["Quantity_used"] = pd.to_numeric(prepared_df["Quantity_used"], errors="coerce").fillna(0)
+    else:
+        prepared_df["Quantity_used"] = 0
 
-    # H pole multiplier
-    h_mask = prepared_df["item"].str.contains("'H' HV/EHV Pole", case=False, na=False)
-    h_recover_mask = prepared_df["item"].str.contains("Recover 'A' / 'H' pole", case=False, na=False)
-    prepared_df.loc[h_mask | h_recover_mask, "Quantity_used"] *= 2
+    # Ensure qcvi exists
+    if "qcvi" in prepared_df.columns:
+        prepared_df["qcvi"] = pd.to_numeric(prepared_df["qcvi"], errors="coerce").fillna(0)
+    else:
+        prepared_df["qcvi"] = 0
+
+    # Ensure item exists
+    if "item" in prepared_df.columns:
+        prepared_df["item_norm"] = prepared_df["item"].apply(normalize_item)
+    else:
+        prepared_df["item_norm"] = ""
+
+    # Apply H-pole multiplier safely
+    if "item" in prepared_df.columns:
+        h_mask = prepared_df["item"].str.contains("'H' HV/EHV Pole", case=False, na=False)
+        h_recover_mask = prepared_df["item"].str.contains("Recover 'A' / 'H' pole", case=False, na=False)
+        prepared_df.loc[h_mask | h_recover_mask, "Quantity_used"] *= 2
 
 excel_file = build_full_excel(prepared_df)
 
