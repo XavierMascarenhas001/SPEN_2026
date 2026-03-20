@@ -990,42 +990,239 @@ else:
     st.info("No data for selected filters.")
 
 prepared_df = filtered_df.copy() if filtered_df is not None else pd.DataFrame()
+# -------------------------------
+# --- Mapping Bar Charts + Drill-down + Excel Export ---
+# -------------------------------
+st.header("🪵 Materials")
+convert_to_miles = st.checkbox("Convert Equipment/Conductor Length to Miles")
 
-if not prepared_df.empty:
-    # Ensure Quantity_used exists
-    if "Quantity_used" in prepared_df.columns:
-        prepared_df["Quantity_used"] = pd.to_numeric(prepared_df["Quantity_used"], errors="coerce").fillna(0)
-    else:
-        prepared_df["Quantity_used"] = 0
+categories = [
+    ("CV7_erect", CV7_erect, "Quantity"),
+    ("CV7_erect_lv", CV7_erect_lv, "Quantity"),
+    ("CV7_recover", CV7_recover, "Quantity"),
+    ("CV7 Tx", CV7_Tx, "Quantity"),
+    ("CV7 OHL CONDUCTOR", CV7_OHL_CONDUCTOR, "Length (Km)"),
+    ("CV7 OHL CONDUCTOR LV", CV7_OHL_CONDUCTOR_LV, "Length (Km)"),
+    ("CV7 SWITCHGEAR", CV7_SWITCHGEAR, "Quantity"),
+    ("CV7_UG", CV7_UG, "Quantity"),
+    ("CV7_CB", CV7_CB, "Quantity"),
+    ("CV31", CV31, "Quantity"),
+]
 
-    # Ensure qcvi exists
-    if "qcvi" in prepared_df.columns:
-        prepared_df["qcvi"] = pd.to_numeric(prepared_df["qcvi"], errors="coerce").fillna(0)
-    else:
-        prepared_df["qcvi"] = 0
+def sanitize_sheet_name(name: str) -> str:
+    name = str(name)
+    name = re.sub(r'[:\\/*?\[\]\n\r]', '_', name)
+    name = re.sub(r'[^\x00-\x7F]', '_', name)
+    return name[:31]
 
-    # Ensure item exists
-    if "item" in prepared_df.columns:
-        prepared_df["item_norm"] = prepared_df["item"].apply(normalize_item)
-    else:
-        prepared_df["item_norm"] = ""
+erect_h_items = [k for k in CV7_erect.keys() if "'H' HV/EHV Pole" in k]
+recover_h_items = [k for k in CV7_recover.keys() if "'A' / 'H' pole" in k]
 
-    # Apply H-pole multiplier safely
-    if "item" in prepared_df.columns:
-        h_mask = prepared_df["item"].str.contains("'H' HV/EHV Pole", case=False, na=False)
-        h_recover_mask = prepared_df["item"].str.contains("Recover 'A' / 'H' pole", case=False, na=False)
-        prepared_df.loc[h_mask | h_recover_mask, "Quantity_used"] *= 2
+for cat_name, keys, y_label in categories:
 
-if not prepared_df.empty:
+    if 'item' not in filtered_df.columns or 'mapped' not in filtered_df.columns:
+        st.warning("Missing required columns: item / mapped")
+        continue
+
+    pattern = '|'.join([re.escape(k) for k in keys.keys()])
+    mask = filtered_df['item'].astype(str).str.contains(pattern, case=False, na=False)
+    sub_df = filtered_df[mask]
+
+    if sub_df.empty:
+        st.info(f"No data found for {cat_name}")
+        continue
+
+    # Clean numeric columns
+    sub_df['qvci_clean'] = pd.to_numeric(sub_df.get('qvci', 0), errors='coerce').fillna(0)
+    sub_df['qsub_clean'] = pd.to_numeric(sub_df.get('qsub', 0), errors='coerce').fillna(0)
+    sub_df["multiplier"] = 1
+    sub_df.loc[sub_df["item"].isin(erect_h_items), "multiplier"] = 2
+    sub_df.loc[sub_df["item"].isin(recover_h_items), "multiplier"] = 2
+    sub_df["adj_value"] = sub_df["qsub_clean"] * sub_df["multiplier"]
+
+    # Aggregate
+    bar_data = sub_df.groupby('mapped').agg(
+        Total=('adj_value', 'sum'),
+        Variation=('qvci_clean', 'sum')
+    ).reset_index()
+    bar_data.rename(columns={'mapped':'Mapped'}, inplace=True)
+    bar_data['PositiveVar'] = bar_data['Variation'].clip(lower=0)
+    bar_data['NegativeVar'] = bar_data['Variation'].clip(upper=0)
+
+    # Convert to miles if needed
+    y_axis_label = y_label
+    if cat_name in ["Conductors", "Conductors_2"] and convert_to_miles:
+        bar_data['Total'] = bar_data['Total'] * 0.621371
+        y_axis_label = "Length (Miles)"
+
+    grand_total = bar_data['Total'].sum()
+    st.subheader(f"🔹 {cat_name} — Total: {grand_total:,.2f}")
+
+    # Plot bar chart
+    fig = go.Figure()
+    fig.add_bar(
+        x=bar_data['Mapped'], y=bar_data['Total'],
+        name="Quantity", marker_color="#4C78A8", text=bar_data['Total'],
+        texttemplate='%{y:,.1f}', textposition='outside'
+    )
+    fig.add_bar(
+        x=bar_data['Mapped'], y=bar_data['PositiveVar'],
+        name="Positive Variation", marker_color="green"
+    )
+    fig.add_bar(
+        x=bar_data['Mapped'], y=bar_data['NegativeVar'],
+        name="Negative Variation", marker_color="red"
+    )
+    fig.update_layout(
+        barmode='relative', title=f"{cat_name} Overview",
+        xaxis_title="Mapping", yaxis_title=y_axis_label,
+        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+        yaxis=dict(gridcolor='rgba(255,255,255,0.3)')
+    )
+    st.plotly_chart(fig, use_container_width=True, height=500)
+
+    # Collapsible drill-down
+    with st.expander("🔍 Click to explore more information", expanded=False):
+        st.subheader("Select Mapping to Drill-down:")
+        cols = st.columns(3)
+        for idx, mapping_value in enumerate(bar_data['Mapped']):
+            col_idx = idx % 3
+            with cols[col_idx]:
+                button_key = f"btn_{cat_name}_{mapping_value}_{idx}"
+                if st.button(f"📊 {mapping_value}", key=button_key, use_container_width=True):
+                    st.session_state[f"selected_{cat_name}"] = mapping_value
+                    st.rerun()
+
+    selected_mapping = st.session_state.get(f"selected_{cat_name}")
+    if selected_mapping:
+        st.subheader(f"Details for: **{selected_mapping}**")
+        if st.button("❌ Clear Selection", key=f"clear_{cat_name}"):
+            del st.session_state[f"selected_{cat_name}"]
+            st.rerun()
+
+        selected_rows = sub_df[sub_df['mapped'] == selected_mapping].copy()
+        selected_rows.columns = selected_rows.columns.str.strip().str.lower()
+        extra_cols = ['poling team','team_name','shire','project','projectmanager','segmentcode','segmentdesc','material_code','pid_ohl_nr','sourcefile']
+        extra_cols = [c for c in extra_cols if c in selected_rows.columns]
+
+        # Display table
+        st.write("🔹 Information Resumed:")
+        if not selected_rows.empty:
+            st.dataframe(selected_rows, use_container_width=True)
+            st.write(f"**Total records:** {len(selected_rows)}")
+
+# -------------------------------
+# ---- Full Excel Export ----
+# -------------------------------
+if filtered_df is not None and not filtered_df.empty:
     buffer_agg = BytesIO()
-    with pd.ExcelWriter(buffer_agg, engine='openpyxl') as writer:
-        # Output the full prepared_df
-        prepared_df.to_excel(writer, sheet_name='Output', index=False)
+    with pd.ExcelWriter(buffer_agg, engine="openpyxl") as writer:
+
+        export_df = filtered_df.rename(columns=column_rename_map).copy()
+        export_df["Quantity_used"] = pd.to_numeric(export_df.get("Quantity_used", 0), errors="coerce").fillna(0)
+        export_df["item_norm"] = export_df["item"].apply(normalize_item)
+
+        # Multiply H-poles
+        h_mask = export_df["item"].str.contains("'H' HV/EHV Pole", case=False, na=False)
+        h_recover_mask = export_df["item"].str.contains("Recover 'A' / 'H' pole, up", case=False, na=False)
+        export_df.loc[h_mask | h_recover_mask, "Quantity_used"] *= 2
+
+        # ---- Output Sheet ----
+        export_df.to_excel(writer, sheet_name="Output", index=False, startrow=1, na_rep="")
+        ws_output = writer.sheets["Output"]
+
+        # ---- Summary Sheet ----
+        summary_rows = []
+        for project, df_proj in export_df.groupby("project"):
+            df_proj = df_proj.copy()
+            df_proj["qcvi"] = pd.to_numeric(df_proj.get("qcvi", 0), errors='coerce').fillna(0)
+            summary_rows.append({
+                "Project": project,
+                "CV7_erect": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_erect.keys()])]["Quantity_used"].sum(),
+                "CV7_erect_lv": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_erect_lv.keys()])]["Quantity_used"].sum(),
+                "CV7 Recover": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_recover.keys()])]["Quantity_used"].sum(),
+                "CV7_TX": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_Tx.keys()])]["Quantity_used"].sum(),
+                "Conductor_hv": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_OHL_CONDUCTOR.keys()])]["Quantity_used"].sum(),
+                "Conductor_lv": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_OHL_CONDUCTOR_LV.keys()])]["Quantity_used"].sum(),
+                "switchgear_norm": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_SWITCHGEAR.keys()])]["Quantity_used"].sum(),
+                "ug_norm": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_UG.keys()])]["Quantity_used"].sum(),
+                "cb_norm": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV7_CB.keys()])]["Quantity_used"].sum(),
+                "cv31_norm": df_proj[df_proj["item_norm"].isin([normalize_item(i) for i in CV31.keys()])]["Quantity_used"].sum(),
+                "Total Value (£)": df_proj.get("total", pd.Series([0])).sum(),
+                "QCVI": df_proj["qcvi"].sum()
+            })
+        final_summary = pd.DataFrame(summary_rows).sort_values("Project")
+        if not final_summary.empty:
+            total_row = final_summary.select_dtypes(include="number").sum().to_dict()
+            total_row["Project"] = "Total"
+            total_row["QCVI"] = final_summary["QCVI"].sum()
+            final_summary = pd.concat([final_summary, pd.DataFrame([total_row])], ignore_index=True)
+        qcvi_series = final_summary.pop("QCVI")  # remove QCVI column
+        final_summary.to_excel(writer, sheet_name="Summary", index=False, startrow=1, na_rep="")
+
+        # ---- Breakdown Sheets ----
+        breakdown_columns = {
+            "CV7_erect": CV7_erect.keys(),
+            "CV7_erect_lv": CV7_erect_lv.keys(),
+            "CV7_recover": CV7_recover.keys(),
+            "CV7_TX": CV7_Tx.keys(),
+            "Conductor_hv": CV7_OHL_CONDUCTOR.keys(),
+            "Conductor_lv": CV7_OHL_CONDUCTOR_LV.keys(),
+            "switchgear_norm": CV7_SWITCHGEAR.keys(),
+            "ug_norm": CV7_UG.keys(),
+            "cb_norm": CV7_CB.keys(),
+            "cv31_norm": CV31.keys()
+        }
+
+        for col_name, keys in breakdown_columns.items():
+            df_breakdown = export_df[export_df["item_norm"].isin([normalize_item(k) for k in keys])].copy()
+            cols_to_include_sheet = ["item","comment","Quantity_used","qcvi","material_code","pole","datetouse_dt","done","District","project","Project Manager","location_map","Circuit","Segment","sourcefile"]
+            cols_to_include_sheet = [c for c in cols_to_include_sheet if c in df_breakdown.columns]
+            df_breakdown = df_breakdown[cols_to_include_sheet]
+            df_breakdown.to_excel(writer, sheet_name=col_name[:31], index=False, startrow=1, na_rep="")
+
+        # ---- Apply formatting + images ----
+        IMG_HEIGHT = 120
+        IMG_WIDTH_SMALL = 120
+        IMG_WIDTH_LARGE = IMG_WIDTH_SMALL * 3
+        header_font = Font(bold=True, size=16)
+        header_fill = PatternFill(start_color="00CCFF", end_color="00CCFF", fill_type="solid")
+        thin_side = Side(style="thin")
+        medium_side = Side(style="medium")
+        thick_side = Side(style="thick")
+        light_grey_fill = PatternFill(start_color="D9D9D9", end_color="D9D9D9", fill_type="solid")
+        white_fill = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+        red_font = Font(color="FF0000")
+        green_font = Font(color="00AA00")
+
+        for ws in writer.sheets.values():
+            ws.row_dimensions[1].height = 90
+            img1 = XLImage("Images/GaeltecImage.png"); img1.width=IMG_WIDTH_SMALL; img1.height=IMG_HEIGHT; img1.anchor="B1"
+            img2 = XLImage("Images/SPEN.png"); img2.width=IMG_WIDTH_LARGE; img2.height=IMG_HEIGHT; img2.anchor="A1"
+            ws.add_image(img1); ws.add_image(img2)
+
+            max_col = ws.max_column
+            for col_idx, cell in enumerate(ws[2], start=1):
+                cell.font = header_font
+                cell.fill = header_fill
+                ws.column_dimensions[get_column_letter(col_idx)].width = 60 if col_idx == 1 else 20
+                cell.border = Border(left=thick_side if col_idx==1 else medium_side,
+                                     right=thick_side if col_idx==max_col else medium_side,
+                                     top=thick_side, bottom=thick_side)
+            # Format rows
+            for row_idx in range(3, ws.max_row + 1):
+                fill = light_grey_fill if row_idx % 2 == 1 else white_fill
+                for col_idx in range(1, ws.max_column+1):
+                    cell = ws.cell(row=row_idx, column=col_idx)
+                    cell.fill = fill
+                    cell.border = Border(left=thin_side, right=thin_side, top=thin_side, bottom=thin_side)
 
     buffer_agg.seek(0)
     st.download_button(
-        "📥 Download Excel (Output Details)",
-        buffer_agg,
+        label="📥 Download Excel (Output Details)",
+        data=buffer_agg,
         file_name="Gaeltec_Output.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+else:
+    st.info("No data available for Excel export.")
